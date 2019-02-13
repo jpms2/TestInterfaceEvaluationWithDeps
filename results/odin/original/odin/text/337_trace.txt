@@ -1,0 +1,6 @@
+[path:\features\step_definitions\confirmation_steps.rb, methods:[0, 5, 9, 13, 17, 23]]
+[path:\features\step_definitions\lesson_steps.rb, methods:[20, 4, 8, 12]]
+[path:\features\step_definitions\reset_password_steps.rb, methods:[0, 9, 15, 19, 31, 25, 35]]
+[path:\features\step_definitions\sign_in_steps.rb, methods:[0, 10, 14, 18, 23, 36, 41]]
+[path:\features\step_definitions\sign_out.rb, methods:[0, 8]]
+[path:\features\support\auth_helpers.rb, methods:[[name:log_in, step:Given ], [name:log_in, step:When ]]]

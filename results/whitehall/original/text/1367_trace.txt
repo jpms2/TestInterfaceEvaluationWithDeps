@@ -1,0 +1,6 @@
+[path:\features\step_definitions\document_steps.rb, methods:[137, 175]]
+[path:\features\step_definitions\policy_group_steps.rb, methods:[0, 12]]
+[path:\features\step_definitions\session_steps.rb, methods:[0]]
+[path:\features\step_definitions\specialist_sector_steps.rb, methods:[14]]
+[path:\features\support\gds_sso_helper.rb, methods:[[name:login_as, step:Given ]]]
+[path:\features\support\specialist_sector_helper.rb, methods:[[name:unstub_tag_finder, step:Given ]]]

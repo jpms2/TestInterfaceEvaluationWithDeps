@@ -1,0 +1,667 @@
+Given /^a user with email "([^\"]*)"$/ do |email|
+  create_user(:email => email)
+end
+Given /^a user with username "([^\"]*)"$/ do |username|
+  create_user(:email => username + "@" + username + '.' + username, :username => username)
+end
+Given /^a user named "([^\"]*)" with email "([^\"]*)"$/ do |name, email|
+  first, last = name.split
+  user = create_user(:email => email, :username => "#{first}_#{last}")
+  user.profile.update_attributes!(:first_name => first, :last_name => last) if first
+end
+Given /^a nsfw user with email "([^\"]*)"$/ do |email|
+  user = create_user(:email => email)
+  user.profile.update_attributes(:nsfw => true)
+end
+Given /^(?:|[tT]hat )?following user[s]?(?: exist[s]?)?:$/ do |table|
+  table.hashes.each do |hash|
+    if hash.has_key? "username" and hash.has_key? "email"
+      step %{a user named "#{hash['username']}" with email "#{hash['email']}"}
+    elsif hash.has_key? "username"
+      step %{a user with username "#{hash['username']}"}
+    elsif hash.has_key? "email"
+      step %{a user with email "#{hash['email']}"}
+    end
+  end
+end
+Given /^I have been invited by bob$/ do
+  @inviter = FactoryGirl.create(:user, :email => 'bob@bob.bob')
+  @inviter_invite_count = @inviter.invitation_code.count
+  i = EmailInviter.new("new_invitee@example.com", @inviter)
+  i.send!
+end
+When /^I should see one less invite$/ do
+  step "I should see \"#{@inviter_invite_count -1} invites left\""
+end
+Given /^I have an aspect called "([^\"]*)"$/ do |aspect_name|
+  @me.aspects.create!(:name => aspect_name)
+  @me.reload
+end
+Given /^a user with email "([^"]*)" is connected with "([^"]*)"$/ do |arg1, arg2|
+  user1 = User.where(:email => arg1).first
+  user2 = User.where(:email => arg2).first
+  connect_users(user1, user1.aspects.where(:name => "Besties").first, user2, user2.aspects.where(:name => "Besties").first)
+end
+Given /^a user with username "([^"]*)" is connected with "([^"]*)"$/ do |arg1, arg2|
+  user1 = User.where(:username => arg1).first
+  user2 = User.where(:username => arg2).first
+  connect_users(user1, user1.aspects.where(:name => "Besties").first, user2, user2.aspects.where(:name => "Besties").first)
+end
+Then /^I should have (\d) contacts? in "([^"]*)"$/ do |n_contacts, aspect_name|
+  @me.aspects.where(:name => aspect_name).first.contacts.count.should == n_contacts.to_i
+end
+When /^I (?:add|remove) the person (?:to|from) my "([^\"]*)" aspect$/ do |aspect_name|
+  toggle_aspect_via_ui(aspect_name)
+end
+Then /^I should have (\d+) Devise email delivery$/ do |n|
+  Devise.mailer.deliveries.length.should == n.to_i
+end
+Then /^I should have (\d+) email delivery$/ do |n|
+  ActionMailer::Base.deliveries.length.should == n.to_i
+end
+Then /^I should not see "([^\"]*)" in the last sent email$/ do |text|
+  email_text = Devise.mailer.deliveries.first.body.to_s
+  email_text = Devise.mailer.deliveries.first.html_part.body.raw_source if email_text.blank?
+  email_text.should_not match(text)
+end
+When /^"([^\"]+)" has posted a status message with a photo$/ do |email|
+  user = User.find_for_database_authentication(:username => email)
+  post = FactoryGirl.create(:status_message_with_photo, :text => "Look at this dog", :author => user.person)
+  [post, post.photos.first].each do |p|
+    user.add_to_streams(p, user.aspects)
+    user.dispatch_post(p)
+  end
+end
+Given /^I have (\d+) contacts$/ do |n|
+  count = n.to_i - @me.contacts.count
+
+  people = []
+  contacts = []
+  aspect_memberships = []
+
+  count.times do
+    person = FactoryGirl.create(:person)
+    people << person
+  end
+
+  people.each do |person|
+    contacts << Contact.new(:person_id => person.id, :user_id => @me.id, :sharing => true, :receiving => true)
+  end
+  Contact.import(contacts)
+  contacts = @me.contacts.limit(n.to_i)
+
+  aspect_id = @me.aspects.length == 1 ? @me.aspects.first.id : @me.aspects.where(:name => "Besties").first.id
+  contacts.each do |contact|
+    aspect_memberships << AspectMembership.new(:contact_id => contact.id, :aspect_id => aspect_id)
+  end
+  AspectMembership.import(aspect_memberships)
+end
+When /^I fill in the new user form/ do
+  fill_in_new_user_form
+end
+  def create_user(overrides={})
+    default_attrs = {
+        :password => 'password',
+        :password_confirmation => 'password',
+        :getting_started => false
+    }
+
+    user = FactoryGirl.create(:user, default_attrs.merge(overrides))
+    add_standard_aspects(user)
+    user
+  end
+  def fill_in_new_user_form
+    @username = "ohai"
+    fill_in('user_username', with: @username)
+    fill_in('user_email', with: "#{@username}@example.com")
+    fill_in('user_password', with: 'secret')
+    fill_in('user_password_confirmation', with: 'secret')
+
+    # captcha needs to be filled out, because the field is required (HTML5)
+    # in test env, the captcha will always pass successfully
+    fill_in('user_captcha', with: '123456')
+  end
+  def toggle_aspect_via_ui(aspect_name)
+    aspects_dropdown = find(".aspect_membership_dropdown .dropdown-toggle", match: :first)
+    aspects_dropdown.click
+    selected_aspect_count = all(".aspect_membership_dropdown.open .dropdown-menu li.selected").length
+    aspect = find(".aspect_membership_dropdown.open .dropdown-menu li", text: aspect_name)
+    aspect_selected = aspect["class"].include? "selected"
+    aspect.click
+    aspect.parent.should have_no_css(".loading")
+
+    # close dropdown
+    page.should have_no_css('#profile.loading')
+    unless selected_aspect_count == 0 or (selected_aspect_count == 1 and aspect_selected )
+      aspects_dropdown.click
+    end
+    aspects_dropdown.should have_no_xpath("..[contains(@class, 'active')]")
+  end
+  def add_standard_aspects(user)
+    user.aspects.create(:name => "Besties")
+    user.aspects.create(:name => "Unicorns")
+  end
+Given /^(?:I am signed in)$/ do
+  automatic_login
+  confirm_login
+end
+When /^I try to sign in manually$/ do
+  manual_login
+end
+When /^I (?:sign|log) in as "([^"]*)"$/ do |email|
+  @me = User.find_by_email(email)
+  @me.password ||= 'password'
+  automatic_login
+  confirm_login
+end
+When /^I (?:sign|log) in as "([^"]*)" on the mobile website$/ do |email|
+  @me = User.find_by_email(email)
+  @me.password ||= 'password'
+  automatic_login
+  confirm_login_mobile
+end
+When /^I put in my password in "([^"]*)"$/ do |field|
+ step %(I fill in "#{field}" with "#{@me.password}")
+end
+When /^I (?:log|sign) out$/ do
+  logout
+end
+  def automatic_login
+    @me ||= FactoryGirl.create(:user_with_aspect, :getting_started => false)
+    visit(new_integration_sessions_path(:user_id => @me.id))
+    click_button "Login"
+  end
+  def manual_login
+    visit login_page
+    login_as @me.username, @me.password
+  end
+  def confirm_login
+    page.has_content?("#{@me.first_name} #{@me.last_name}")
+  end
+  def confirm_login_mobile
+    page.has_css?("#notification_badge")
+  end
+  def logout
+    $browser.delete_cookie('_session', 'path=/') if $browser
+    $browser.delete_all_visible_cookies if $browser
+  end
+  def login_page
+    path_to "the new user session page"
+  end
+  def login_as(user, pass)
+    fill_in 'user_username', :with=>user
+    fill_in 'user_password', :with=>pass
+    click_button "Sign in"
+  end
+  def path_to(page_name)
+    case page_name
+    when /^person_photos page$/
+      person_photos_path(@me.person)
+    when /^the home(?: )?page$/
+      stream_path
+    when /^the tag page for "([^\"]*)"$/
+      tag_path(Regexp.last_match(1))
+    when /^its ([\w ]+) page$/
+      send("#{Regexp.last_match(1).gsub(/\W+/, '_')}_path", @it)
+    when /^the mobile ([\w ]+) page$/
+      public_send("#{Regexp.last_match(1).gsub(/\W+/, '_')}_path", format: "mobile")
+    when /^the ([\w ]+) page$/
+      public_send("#{Regexp.last_match(1).gsub(/\W+/, '_')}_path")
+    when /^my edit profile page$/
+      edit_profile_path
+    when /^my profile page$/
+      person_path(@me.person)
+    when /^my acceptance form page$/
+      invite_code_path(InvitationCode.first)
+    when /^the requestors profile$/
+      person_path(Request.where(recipient_id: @me.person.id).first.sender)
+    when /^"([^\"]*)"'s page$/
+      p = User.find_by_email(Regexp.last_match(1)).person
+      {path:         person_path(p),
+       # '#diaspora_handle' on desktop, '.description' on mobile
+       special_elem: {selector: "#diaspora_handle, .description", text: p.diaspora_handle}
+      }
+    when /^"([^\"]*)"'s photos page$/
+      p = User.find_by_email(Regexp.last_match(1)).person
+      person_photos_path p
+    when /^my account settings page$/
+      edit_user_path
+    when /^forgot password page$/
+      new_user_password_path
+    when %r{^"(/.*)"}
+      Regexp.last_match(1)
+    else
+      raise "Can't find mapping from \"#{page_name}\" to a path."
+    end
+  end
+Given /^(?:|I )am on (.+)$/ do |page_name|
+  navigate_to(page_name)
+end
+When /^(?:|I )go to (.+)$/ do |page_name|
+  navigate_to(page_name)
+end
+When /^(?:|I )press "([^"]*)"(?: within "([^"]*)")?$/ do |button, selector|
+  with_scope(selector) do
+    click_button(button)
+  end
+end
+When /^(?:|I )follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
+  with_scope(selector) do
+    click_link(link)
+  end
+end
+When /^(?:|I )fill in "([^"]*)" with "([^"]*)"(?: within "([^"]*)")?$/ do |field, value, selector|
+  with_scope(selector) do
+    fill_in(field, :with => value)
+  end
+end
+When /^(?:|I )fill in the following(?: within "([^"]*)")?:$/ do |selector, fields|
+  with_scope(selector) do
+    fields.rows_hash.each do |name, value|
+      step %{I fill in "#{name}" with "#{value}"}
+    end
+  end
+end
+When /^(?:|I )select "([^"]*)" from "([^"]*)"(?: within "([^"]*)")?$/ do |value, field, selector|
+  with_scope(selector) do
+    select(value, :from => field)
+  end
+end
+When /^(?:|I )attach the file "([^"]*)" to (?:hidden )?"([^"]*)"(?: within "([^"]*)")?$/ do |path, field, selector|
+  with_scope(selector) do
+    page.execute_script("$(\"input[name='#{field}']\").css('opacity', '1');")
+    attach_file(field, Rails.root.join(path).to_s)
+  end
+end
+Then /^(?:|I )should see (\".+?\"[\s]*)(?:[\s]+within[\s]* "([^"]*)")?$/ do |vars, selector|
+  vars.scan(/"([^"]+?)"/).flatten.each do |text|
+    with_scope(selector) do
+      current_scope.should have_content(text)
+    end
+  end
+end
+Then /^(?:|I )should not see (\".+?\"[\s]*)(?:[\s]+within[\s]* "([^"]*)")?$/ do |vars,selector|
+  vars.scan(/"([^"]+?)"/).flatten.each do |text|
+    with_scope(selector) do
+      page.should have_no_content(text)
+    end
+  end
+end
+Then /^the "([^"]*)" field(?: within "([^"]*)")? should contain "([^"]*)"$/ do |field, selector, value|
+  with_scope(selector) do
+    field = find_field(field)
+    field_value = (field.tag_name == 'textarea') ? field.text : field.value
+    field_value.should =~ /#{value}/
+  end
+end
+Then /^the "([^"]*)" checkbox(?: within "([^"]*)")? should be checked$/ do |label, selector|
+  with_scope(selector) do
+    field_checked = find_field(label)['checked']
+    field_checked.should eq('true')
+  end
+end
+Then /^the "([^"]*)" checkbox(?: within "([^"]*)")? should not be checked$/ do |label, selector|
+  with_scope(selector) do
+    field_checked = find_field(label)['checked']
+    field_checked.should be_falsey
+  end
+end
+Then /^the "([^"]*)" bootstrap-switch should be (on|off)$/ do |label, state|
+  result = execute_script("return $('#{label}').bootstrapSwitch('state')")
+  result.should state == "on" ? be_truthy : be_falsey
+end
+Then /^I toggle the "([^"]*)" bootstrap-switch$/ do |label|
+  execute_script("return $('#{label}').bootstrapSwitch('toggleState')")
+end
+Then /^(?:|I )should be on (.+)$/ do |page_name|
+  confirm_on_page(page_name)
+end
+  def navigate_to(page_name)
+    path = path_to(page_name)
+    if path.is_a?(Hash)
+      visit(path[:path])
+      await_elem = path[:special_elem]
+      find(await_elem.delete(:selector), await_elem)
+    else
+      visit(path)
+    end
+  end
+  def confirm_on_page(page_name)
+    expect(page).to have_path(path_to(page_name))
+  end
+  def with_scope(locator)
+    if locator
+      within(locator, match: :first) do
+        yield
+      end
+    else
+      yield
+    end
+  end
+Then /^"([^"]*)" should be part of active conversation$/ do |name|
+  within(".conversation_participants") do
+    find("img.avatar[title^='#{name}']").should_not be_nil
+  end
+end
+Then /^I should have (\d+) unread private messages?$/ do |n_unread|
+  expect(find("header #conversations-link .badge")).to have_content(n_unread)
+end
+Then /^I send a message with subject "([^"]*)" and text "([^"]*)" to "([^"]*)"$/ do |subject, text, person|
+  step %(I am on the conversations page)
+  within("#conversation_new", match: :first) do
+    step %(I fill in "contact_autocomplete" with "#{person}")
+    step %(I press the first ".as-result-item" within ".as-results")
+    step %(I fill in "conversation_subject" with "#{subject}")
+    step %(I fill in "conversation_text" with "#{text}")
+    step %(I press "Send")
+  end
+end
+Then /^I send a message with subject "([^"]*)" and text "([^"]*)" to "([^"]*)" using keyboard shortcuts$/ do |subject, text, person|
+  step %(I am on the conversations page)
+  within("#conversation_new", match: :first) do
+    step %(I fill in "contact_autocomplete" with "#{person}")
+    step %(I press the first ".as-result-item" within ".as-results")
+    step %(I fill in "conversation_subject" with "#{subject}")
+    step %(I fill in "conversation_text" with "#{text}")
+    find("#conversation_text").native.send_keys :control, :return
+  end
+end
+When /^I reply with "([^"]*)"$/ do |text|
+  step %(I am on the conversations page)
+  step %(I press the first ".conversation" within ".conversations")
+  step %(I fill in "message_text" with "#{text}")
+  step %(I press "Reply")
+end
+When /^I reply with "([^"]*)" using keyboard shortcuts$/ do |text|
+  step %(I am on the conversations page)
+  step %(I press the first ".conversation" within ".conversations")
+  step %(I fill in "message_text" with "#{text}")
+  find("#message_text").native.send_keys :control, :return
+end
+Then /^I should see "([^"]*)" as a participant$/ do |name|
+  find(".conversation.stream_element img.avatar[title^='#{name}']").should_not be_nil
+end
+When /^I enter "([^"]*)" in the search input$/ do |search_term|
+  fill_in "q", :with => search_term
+end
+When /^I click on the first search result$/ do
+  within(".tt-menu") do
+    find(".tt-suggestion", match: :first).click
+  end
+end
+When /^I press enter in the search input$/ do
+  find("input#q").native.send_keys :return
+end
+Then /^I should not see any search results$/ do
+  expect(page).to_not have_selector(".tt-suggestion")
+end
+And /^I mark myself as not safe for work$/ do
+  check('profile[nsfw]')
+end
+And /^I mark myself as safe for work$/ do
+  uncheck('profile[nsfw]')
+end
+And /^I mark myself as not searchable$/ do
+  uncheck("profile[searchable]")
+end
+When /^(.*) in the header$/ do |action|
+  within('header') do
+    step action
+  end
+end
+And /^I submit the form$/ do
+  find("input[type='submit']").click
+end
+And /^I expand the publisher$/ do
+ click_publisher
+end
+And /^I close the publisher$/ do
+ find("#publisher #hide_publisher").click
+end
+When /^I click to delete the first comment$/ do
+  within("div.comment", match: :first) do
+    find(".comment_delete", visible: false).click
+  end
+end
+And /^I click on selector "([^"]*)"$/ do |selector|
+  find(selector).click
+end
+And /^I click on the first selector "([^"]*)"$/ do |selector|
+  find(selector, match: :first).click
+end
+And /^I confirm the alert$/ do
+  page.driver.browser.switch_to.alert.accept
+end
+When /^I press the first "([^"]*)"(?: within "([^"]*)")?$/ do |link_selector, within_selector|
+  with_scope(within_selector) do
+    current_scope.find(link_selector, match: :first).click
+  end
+end
+Then /^(?:|I )should see a "([^\"]*)"(?: within "([^\"]*)")?$/ do |selector, scope_selector|
+  with_scope(scope_selector) do
+    current_scope.should have_css selector
+  end
+end
+Then /^(?:|I )should not see a "([^\"]*)"(?: within "([^\"]*)")?$/ do |selector, scope_selector|
+  with_scope(scope_selector) do
+    current_scope.should have_no_css(selector, :visible => true)
+  end
+end
+When /^I search for "([^\"]*)"$/ do |search_term|
+  fill_in "q", :with => search_term
+  find_field("q").native.send_key(:enter)
+  have_content(search_term)
+end
+Then /^the "([^"]*)" field(?: within "([^"]*)")? should be filled with "([^"]*)"$/ do |field, selector, value|
+  with_scope(selector) do
+    field = find_field(field)
+    field_value = (field.tag_name == 'textarea') ? field.text : field.value
+    field_value = field_value.first if field_value.is_a? Array
+    field_value.should == value
+  end
+end
+Then /^I should see a flash message indicating success$/ do
+  flash_message_success?.should be true
+end
+Then /^I should see a flash message with a warning$/ do
+  flash_message_alert?.should be true
+end
+  def click_publisher
+    page.execute_script('
+     $("#publisher").removeClass("closed");
+     $("#publisher").find("#status_message_fake_text").focus();
+    ')
+  end
+  def flash_message_success?
+    flash_message(selector: "notice").visible?
+  end
+  def flash_message_alert?
+    flash_message(selector: "alert").visible?
+  end
+  def flash_message(opts={})
+    selector = opts.delete(:selector)
+    selector &&= "#flash_#{selector}"
+    find(selector || '.message', {match: :first}.merge(opts))
+  end
+When /^I open the drawer$/ do
+  find('#menu_badge').click
+end
+Then /^I should not see any picture in my stream$/ do
+  expect(page).to have_selector(".photo_area img", count: 0)
+end
+Then /^I should see (\d+) pictures in my stream$/ do |count|
+  expect(page).to have_selector(".photo_area img", count: count)
+end
+Given /^"([^"]*)" has a public post with text "([^"]*)"$/ do |email, text|
+  user = User.find_by_email(email)
+  user.post(:status_message, :text => text, :public => true, :to => user.aspect_ids)
+end
+Given /^"([^"]*)" has a public post with text "([^"]*)" and a poll$/ do |email, text|
+  user = User.find_by(email: email)
+  post = user.post(:status_message, text: text, public: true, to: user.aspect_ids)
+  FactoryGirl.create(:poll, status_message: post)
+end
+Given /^"([^"]*)" has a public post with text "([^"]*)" and a location$/ do |email, text|
+  user = User.find_by(email: email)
+  post = user.post(:status_message, text: text, public: true, to: user.aspect_ids)
+  FactoryGirl.create(:location, status_message: post)
+end
+Given /^"([^"]*)" has a public post with text "([^"]*)" and a picture/ do |email, text|
+  user = User.find_by(email: email)
+  post = user.post(:status_message, text: text, public: true, to: user.aspect_ids)
+  FactoryGirl.create(:photo, status_message: post)
+end
+And /^the post with text "([^"]*)" is reshared by "([^"]*)"$/ do |text, email|
+  user = User.find_by_email(email)
+  root = Post.find_by_text(text)
+  user.post(:reshare, :root_guid => root.guid, :public => true, :to => user.aspect_ids)
+end
+And /^I submit the publisher$/ do
+  submit_publisher
+end
+When /^I write the status message "([^"]*)"$/ do |text|
+  write_in_publisher(text)
+end
+  def write_in_publisher(txt)
+    fill_in 'status_message_fake_text', with: txt
+  end
+  def submit_publisher
+    txt = find("#publisher #status_message_fake_text").value
+    find("#publisher .btn-primary").click
+    # wait for the content to appear
+    expect(find("#main_stream")).to have_content(txt)
+  end
+And /^Alice has a post mentioning Bob$/ do
+  alice = User.find_by_email 'alice@alice.alice'
+  bob = User.find_by_email 'bob@bob.bob'
+  aspect = alice.aspects.where(:name => "Besties").first
+  alice.post(:status_message, :text => "@{Bob Jones; #{bob.person.diaspora_handle}}", :to => aspect)
+end
+When /^I (?:like|unlike) the post "([^"]*)" in the stream$/ do |post_text|
+  like_stream_post(post_text)
+end
+Then /^"([^"]*)" should be post (\d+)$/ do |post_text, position|
+  stream_element_numbers_content(position).should have_content(post_text)
+end
+When /^I toggle all nsfw posts$/ do
+  all("a.toggle_nsfw_state").each &:click
+end
+Then /^I should have (\d+) nsfw posts$/ do |num_posts|
+  page.should have_css(".nsfw-shield", count: num_posts.to_i)
+end
+  def stream_element_numbers_content(position)
+    find(".stream_element:nth-child(#{position}) .post-content")
+  end
+  def like_stream_post(post_text)
+    within_post(post_text) do
+      find(:css, 'a.like').click
+    end
+  end
+  def within_post(post_text)
+    within find_post_by_text(post_text) do
+      yield
+    end
+  end
+  def find_post_by_text(text)
+    expect(page).to have_text(text)
+    find(".stream_element", text: text)
+  end
+When /^I focus the comment field$/ do
+  focus_comment_box
+end
+When /^I comment "([^"]*)" on "([^"]*)"$/ do |comment_text, post_text|
+  comment_on_post(post_text, comment_text)
+end
+  def comment_on_post(post_text, comment_text)
+    within_post(post_text) do
+      focus_comment_box
+      make_comment(comment_text)
+    end
+    step %Q(I should see "#{comment_text}" within ".comment")
+  end
+  def focus_comment_box(elem="a.focus_comment_textarea")
+    find(elem).click
+  end
+  def within_post(post_text)
+    within find_post_by_text(post_text) do
+      yield
+    end
+  end
+  def make_comment(text, elem="text")
+    fill_in elem, :with => text
+    click_button "Comment"
+  end
+Then /^I should see a modal$/ do
+  step %{I should see a ".modal.in"}
+end
+When /^I put in my password in the close account modal$/ do
+  # Capybara helpers fill_in, set and send_keys currently don't work
+  # inside of Bootstrap modals on Travis CI
+  execute_script("$(\"#closeAccountModal input#close_account_password\").val(\"#{@me.password}\")")
+  expect(find("#closeAccountModal input#close_account_password").value).to eq(@me.password)
+end
+When /^(.*) in the aspect creation modal$/ do |action|
+  within("#newAspectModal") do
+    step action
+  end
+end
+When /^I drag "([^"]*)" (up|down)$/ do |aspect_name, direction|
+  aspect_id = @me.aspects.where(name: aspect_name).first.id
+  aspect = find(:xpath, "//div[@id='aspect_nav']/ul/a[@data-aspect-id='#{aspect_id}']")
+  target = direction == "up" ? aspect.all(:xpath, "./preceding-sibling::a").last :
+                               aspect.all(:xpath, "./following-sibling::a").first
+  aspect.drag_to(target)
+  expect(page).to have_no_css "#aspect_nav .ui-sortable.syncing"
+end
+Then /^I should see "([^"]*)" as (\d+). aspect$/ do |aspect_name, position|
+  expect(find("#aspect_nav a:nth-child(#{position.to_i + 2})")).to have_text aspect_name
+end
+Given /^a user with email "([^\"]*)"$/ do |email|
+  create_user(:email => email)
+end
+Given /^a user with username "([^\"]*)"$/ do |username|
+  create_user(:email => username + "@" + username + '.' + username, :username => username)
+end
+Given /^a user named "([^\"]*)" with email "([^\"]*)"$/ do |name, email|
+  first, last = name.split
+  user = create_user(:email => email, :username => "#{first}_#{last}")
+  user.profile.update_attributes!(:first_name => first, :last_name => last) if first
+end
+  def create_user(overrides={})
+    default_attrs = {
+        :password => 'password',
+        :password_confirmation => 'password',
+        :getting_started => false
+    }
+
+    user = FactoryGirl.create(:user, default_attrs.merge(overrides))
+    add_standard_aspects(user)
+    user
+  end
+When /^(?:|I )press "([^"]*)"(?: within "([^"]*)")?$/ do |button, selector|
+  with_scope(selector) do
+    click_button(button)
+  end
+end
+When /^(?:|I )fill in "([^"]*)" with "([^"]*)"(?: within "([^"]*)")?$/ do |field, value, selector|
+  with_scope(selector) do
+    fill_in(field, :with => value)
+  end
+end
+Then /^(?:|I )should see (\".+?\"[\s]*)(?:[\s]+within[\s]* "([^"]*)")?$/ do |vars, selector|
+  vars.scan(/"([^"]+?)"/).flatten.each do |text|
+    with_scope(selector) do
+      current_scope.should have_content(text)
+    end
+  end
+end
+When /^I press the first "([^"]*)"(?: within "([^"]*)")?$/ do |link_selector, within_selector|
+  with_scope(within_selector) do
+    current_scope.find(link_selector, match: :first).click
+  end
+end
+Then /^(?:|I )should see a "([^\"]*)"(?: within "([^\"]*)")?$/ do |selector, scope_selector|
+  with_scope(scope_selector) do
+    current_scope.should have_css selector
+  end
+end

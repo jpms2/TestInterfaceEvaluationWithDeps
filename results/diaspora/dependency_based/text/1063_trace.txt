@@ -1,0 +1,6 @@
+[path:\features\step_definitions\custom_web_steps.rb, methods:[58]]
+[path:\features\step_definitions\session_steps.rb, methods:[75, 30, 83]]
+[path:\features\step_definitions\user_steps.rb, methods:[208]]
+[path:\features\step_definitions\web_steps.rb, methods:[179, 35, 21, [name:with_scope, step:When ]]]
+[path:\features\support\paths.rb, methods:[[name:login_page, step:When ], [name:path_to, step:When ], [name:navigate_to, step:Given ], [name:confirm_on_page, step:Then ], [name:path_to, step:Given ], [name:path_to, step:Then ]]]
+[path:\features\support\user_cuke_helpers.rb, methods:[[name:manual_login, step:When ], [name:confirm_login_mobile, step:When ], [name:manual_logout_mobile, step:When ], [name:confirm_getting_started_contents, step:Then ], [name:login_as, step:When ], [name:fill_in_new_user_form, step:When ]]]

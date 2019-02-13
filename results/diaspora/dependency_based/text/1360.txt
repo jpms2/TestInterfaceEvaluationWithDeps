@@ -1,0 +1,150 @@
+Feature: private conversations
+In order to be talkative
+As a User
+I want to converse with people
+Background:
+Given a user named "Robert Grimm" with email "bob@bob.bob"
+And a user named "Alice Awesome" with email "alice@alice.alice"
+And a user with username "robert_grimm" is connected with "alice_awesome"
+Scenario: open the conversations page without any contacts
+Given a user with email "eve@eve.eve"
+When I sign in as "eve@eve.eve"
+And I am on the conversations page
+Then I should see "You need to add some contacts before you can start a conversation"
+Scenario: send a message
+When I sign in as "bob@bob.bob"
+And I send a message with subject "Greetings" and text "hello, alice!" to "Alice Awesome"
+Then I should see "Greetings" within "#conversation_inbox"
+And I should see "Greetings" within "#conversation_show"
+And I should see "less than a minute ago" within "#conversation_inbox"
+And I should see "less than a minute ago" within "#conversation_show"
+And I should see "Alice Awesome" as a participant
+And "Alice Awesome" should be part of active conversation
+And I should see "hello, alice!" within ".stream_container"
+When I sign in as "alice@alice.alice"
+Then I should have 1 unread private message
+And I should have 1 email delivery
+When I reply with "hey, how you doing?"
+Then I should see "hey, how you doing?" within ".stream_container"
+Scenario: send a message using keyboard shortcuts
+When I sign in as "bob@bob.bob"
+And I send a message with subject "Greetings" and text "hello, alice!" to "Alice Awesome" using keyboard shortcuts
+Then I should see "Greetings" within "#conversation_inbox"
+And I should see "Greetings" within "#conversation_show"
+And "Alice Awesome" should be part of active conversation
+And I should see "hello, alice!" within ".stream_container"
+When I reply with "hey, how you doing?" using keyboard shortcuts
+Then I should see "hey, how you doing?" within ".stream_container"
+When I sign in as "alice@alice.alice"
+Then I should have 2 unread private messages
+And I should have 2 email delivery
+Feature: User manages contacts
+In order to share with a limited group
+As a User
+I want to create new aspects
+Scenario: sorting the aspects
+Given I am signed in
+And I have an aspect called "People"
+And I have an aspect called "Cat People"
+When I am on the contacts page
+And I drag "Cat People" up
+And I go to the contacts page
+Then I should see "Cat People" as 2. aspect
+And I should see "People" as 3. aspect
+Feature: posting from the main page
+In order to enlighten humanity for the good of society
+As a rock star
+I want to tell the world I am eating a yogurt
+Background:
+Given following users exist:
+| username   |
+| bob        |
+| alice      |
+And a user with username "bob" is connected with "alice"
+And I sign in as "bob@bob.bob"
+And I have following aspects:
+| PostingTo            |
+| NotPostingThingsHere |
+Scenario: posting a message appends it to the top of the stream
+When I click the publisher and post "sup dog"
+And I click the publisher and post "hello there"
+Then "hello there" should be post 1
+Scenario: post a text-only message to just one aspect
+When I select only "PostingTo" aspect
+And I expand the publisher
+When I write the status message "I am eating a yogurt"
+And I submit the publisher
+When I am on the aspects page
+And I select all aspects
+And I select only "PostingTo" aspect
+Then "I am eating a yogurt" should be post 1
+When I am on the aspects page
+And I select all aspects
+And I select only "NotPostingThingsHere" aspect
+Then I should not see "I am eating a yogurt"
+Scenario: hide a contact's post
+Given I expand the publisher
+When I write the status message "Here is a post for you to hide"
+And I submit the publisher
+And I log out
+And I sign in as "alice@alice.alice"
+And I am on "bob@bob.bob"'s page
+And I hover over the ".stream_element"
+And I click to hide the first post
+And I go to "bob@bob.bob"'s page
+Then I should not see "Here is a post for you to hide"
+When I am on the aspects page
+Then I should not see "Here is a post for you to hide"
+Scenario: change post target aspects with the aspect-dropdown before posting
+When I expand the publisher
+And I press the aspect dropdown
+And I toggle the aspect "PostingTo"
+And I append "I am eating a yogurt" to the publisher
+And I submit the publisher
+And I am on the aspects page
+And I select only "PostingTo" aspect
+Then "I am eating a yogurt" should be post 1
+When I am on the aspects page
+And I select all aspects
+And I select only "NotPostingThingsHere" aspect
+Then I should not see "I am eating a yogurt"
+Feature: posting from own profile page
+In order to be all cool and stuff
+I want to post from my profile page
+Background:
+Given a user with username "alice"
+And I sign in as "alice@alice.alice"
+And I have following aspects:
+| Family |
+| Work   |
+Scenario: posting some text
+Given I expand the publisher
+And I have turned off jQuery effects
+And I append "I want to understand people" to the publisher
+And I select "Family" on the aspect dropdown
+And I press "Share"
+Then "I want to understand people" should be post 1
+When I go to the home page
+Then "I want to understand people" should be post 1
+When I am on the aspects page
+And I select only "Family" aspect
+Then "I want to understand people" should be post 1
+When I select all aspects
+And I select only "Work" aspect
+Then I should not see "I want to understand people"
+Feature: Visit the landing page of the pod
+In order to find out more about the pod
+As a user
+I want to see the landing page
+Scenario: Visit the home page
+When I am on the root page
+Then I should see "LOG IN"
+When I toggle the mobile view
+And I go to the root page
+Then I should see "Welcome, friend"
+When I am on the root page
+Then I should see "Welcome, friend"
+When I go to the mobile path
+Then I should see "LOG IN"
+When I go to the mobile path
+Then I should see "LOG IN"

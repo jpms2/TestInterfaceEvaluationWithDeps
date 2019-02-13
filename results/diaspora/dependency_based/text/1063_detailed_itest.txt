@@ -1,0 +1,133 @@
+Classes: 9
+[name:Hash, file:null, step:Given ]
+[name:InvitationCode, file:diaspora_diaspora\app\models\invitation_code.rb, step:When ]
+[name:InvitationCode, file:diaspora_diaspora\app\models\invitation_code.rb, step:Given ]
+[name:Regexp, file:null, step:When ]
+[name:Regexp, file:null, step:Given ]
+[name:Request, file:diaspora_diaspora\lib\diaspora\federated\request.rb, step:When ]
+[name:Request, file:diaspora_diaspora\lib\diaspora\federated\request.rb, step:Given ]
+[name:User, file:diaspora_diaspora\app\models\user.rb, step:When ]
+[name:User, file:diaspora_diaspora\app\models\user.rb, step:Given ]
+
+Methods: 91
+[name:activity, type:StreamsController, file:diaspora_diaspora\app\controllers\streams_controller.rb, step:When ]
+[name:activity, type:StreamsController, file:diaspora_diaspora\app\controllers\streams_controller.rb, step:Given ]
+[name:btn btn-block btn-primary, type:Object, file:null, step:When ]
+[name:btn btn-block btn-primary, type:Object, file:null, step:Given ]
+[name:btn btn-primary, type:Object, file:null, step:When ]
+[name:btn btn-primary, type:Object, file:null, step:Given ]
+[name:click, type:Object, file:null, step:When ]
+[name:click_button, type:Object, file:null, step:When ]
+[name:click_link, type:Object, file:null, step:When ]
+[name:confirm_getting_started_contents, type:UserCukeHelpers, file:diaspora_diaspora\features\support\user_cuke_helpers.rb, step:Then ]
+[name:confirm_login_mobile, type:UserCukeHelpers, file:diaspora_diaspora\features\support\user_cuke_helpers.rb, step:When ]
+[name:confirm_on_page, type:Paths, file:diaspora_diaspora\features\support\paths.rb, step:Then ]
+[name:delete, type:Object, file:null, step:Given ]
+[name:diaspora_handle, type:Object, file:null, step:When ]
+[name:diaspora_handle, type:Object, file:null, step:Given ]
+[name:edit, type:ProfilesController, file:diaspora_diaspora\app\controllers\profiles_controller.rb, step:When ]
+[name:edit, type:UsersController, file:diaspora_diaspora\app\controllers\admin\users_controller.rb, step:When ]
+[name:edit, type:UsersController, file:diaspora_diaspora\app\controllers\users_controller.rb, step:When ]
+[name:edit, type:ProfilesController, file:diaspora_diaspora\app\controllers\profiles_controller.rb, step:Given ]
+[name:edit, type:UsersController, file:diaspora_diaspora\app\controllers\admin\users_controller.rb, step:Given ]
+[name:edit, type:UsersController, file:diaspora_diaspora\app\controllers\users_controller.rb, step:Given ]
+[name:fill_in, type:Object, file:null, step:When ]
+[name:fill_in_new_user_form, type:UserCukeHelpers, file:diaspora_diaspora\features\support\user_cuke_helpers.rb, step:When ]
+[name:find, type:Object, file:null, step:When ]
+[name:find, type:Object, file:null, step:Given ]
+[name:find_by_email, type:User, file:diaspora_diaspora\app\models\user.rb, step:When ]
+[name:find_by_email, type:User, file:diaspora_diaspora\app\models\user.rb, step:Given ]
+[name:find_by_username, type:User, file:diaspora_diaspora\app\models\user.rb, step:When ]
+[name:first, type:InvitationCode, file:diaspora_diaspora\app\models\invitation_code.rb, step:When ]
+[name:first, type:Object, file:null, step:When ]
+[name:first, type:InvitationCode, file:diaspora_diaspora\app\models\invitation_code.rb, step:Given ]
+[name:first, type:Object, file:null, step:Given ]
+[name:force_mobile, type:HomeController, file:diaspora_diaspora\app\controllers\home_controller.rb, step:When ]
+[name:force_mobile, type:HomeController, file:diaspora_diaspora\app\controllers\home_controller.rb, step:Given ]
+[name:gsub, type:Object, file:null, step:When ]
+[name:gsub, type:Object, file:null, step:Given ]
+[name:has_css?, type:Object, file:null, step:When ]
+[name:have_content, type:Object, file:null, step:Then ]
+[name:have_field, type:Object, file:null, step:Then ]
+[name:id, type:UserApplicationPresenter, file:diaspora_diaspora\app\presenters\user_application_presenter.rb, step:When ]
+[name:id, type:UserApplicationPresenter, file:diaspora_diaspora\app\presenters\user_application_presenter.rb, step:Given ]
+[name:index, type:PhotosController, file:diaspora_diaspora\app\controllers\photos_controller.rb, step:When ]
+[name:index, type:PhotosController, file:diaspora_diaspora\app\controllers\photos_controller.rb, step:Given ]
+[name:is_a?, type:Object, file:null, step:Given ]
+[name:local_or_remote_person_path, type:PeopleHelper, file:diaspora_diaspora\app\helpers\people_helper.rb, step:When ]
+[name:local_or_remote_person_path, type:PeopleHelper, file:diaspora_diaspora\app\helpers\people_helper.rb, step:Given ]
+[name:login_as, type:UserCukeHelpers, file:diaspora_diaspora\features\support\user_cuke_helpers.rb, step:When ]
+[name:login_page, type:Paths, file:diaspora_diaspora\features\support\paths.rb, step:When ]
+[name:manual_login, type:UserCukeHelpers, file:diaspora_diaspora\features\support\user_cuke_helpers.rb, step:When ]
+[name:manual_logout_mobile, type:UserCukeHelpers, file:diaspora_diaspora\features\support\user_cuke_helpers.rb, step:When ]
+[name:mentioned, type:StreamsController, file:diaspora_diaspora\app\controllers\streams_controller.rb, step:When ]
+[name:mentioned, type:StreamsController, file:diaspora_diaspora\app\controllers\streams_controller.rb, step:Given ]
+[name:multi, type:StreamsController, file:diaspora_diaspora\app\controllers\streams_controller.rb, step:When ]
+[name:multi, type:StreamsController, file:diaspora_diaspora\app\controllers\streams_controller.rb, step:Given ]
+[name:navigate_to, type:Paths, file:diaspora_diaspora\features\support\paths.rb, step:Given ]
+[name:page, type:Object, file:null, step:When ]
+[name:page, type:Object, file:null, step:Then ]
+[name:password, type:Object, file:null, step:When ]
+[name:path_to, type:Paths, file:diaspora_diaspora\features\support\paths.rb, step:When ]
+[name:path_to, type:Paths, file:diaspora_diaspora\features\support\paths.rb, step:Given ]
+[name:path_to, type:Paths, file:diaspora_diaspora\features\support\paths.rb, step:Then ]
+[name:person, type:Object, file:null, step:When ]
+[name:person, type:PostPresenter, file:diaspora_diaspora\app\presenters\post_presenter.rb, step:When ]
+[name:person, type:Object, file:null, step:Given ]
+[name:person, type:PostPresenter, file:diaspora_diaspora\app\presenters\post_presenter.rb, step:Given ]
+[name:public, type:StreamsController, file:diaspora_diaspora\app\controllers\streams_controller.rb, step:When ]
+[name:public, type:StreamsController, file:diaspora_diaspora\app\controllers\streams_controller.rb, step:Given ]
+[name:public_send, type:Object, file:null, step:When ]
+[name:public_send, type:Object, file:null, step:Given ]
+[name:raise, type:Object, file:null, step:When ]
+[name:raise, type:Object, file:null, step:Given ]
+[name:send, type:Object, file:null, step:When ]
+[name:send, type:Object, file:null, step:Given ]
+[name:sender, type:Object, file:null, step:When ]
+[name:sender, type:Object, file:null, step:Given ]
+[name:show, type:TagsController, file:diaspora_diaspora\app\controllers\tags_controller.rb, step:When ]
+[name:show, type:InvitationCodesController, file:diaspora_diaspora\app\controllers\invitation_codes_controller.rb, step:When ]
+[name:show, type:PhotosController, file:diaspora_diaspora\app\controllers\photos_controller.rb, step:When ]
+[name:show, type:TagsController, file:diaspora_diaspora\app\controllers\tags_controller.rb, step:Given ]
+[name:show, type:InvitationCodesController, file:diaspora_diaspora\app\controllers\invitation_codes_controller.rb, step:Given ]
+[name:show, type:PhotosController, file:diaspora_diaspora\app\controllers\photos_controller.rb, step:Given ]
+[name:text, type:Photo, file:diaspora_diaspora\app\models\photo.rb, step:When ]
+[name:text, type:Photo, file:diaspora_diaspora\app\models\photo.rb, step:Given ]
+[name:to, type:Object, file:null, step:Then ]
+[name:toggle_mobile, type:HomeController, file:diaspora_diaspora\app\controllers\home_controller.rb, step:When ]
+[name:toggle_mobile, type:HomeController, file:diaspora_diaspora\app\controllers\home_controller.rb, step:Given ]
+[name:username, type:Object, file:null, step:When ]
+[name:where, type:Request, file:diaspora_diaspora\lib\diaspora\federated\request.rb, step:When ]
+[name:where, type:Request, file:diaspora_diaspora\lib\diaspora\federated\request.rb, step:Given ]
+[name:with_scope, type:WebSteps, file:diaspora_diaspora\features\step_definitions\web_steps.rb, step:When ]
+[name:within, type:Object, file:null, step:When ]
+
+Referenced pages: 27
+diaspora_diaspora\app\views\aspects\_aspect_listings.haml
+diaspora_diaspora\app\views\aspects\_aspect_stream.haml
+diaspora_diaspora\app\views\devise\passwords\new.haml
+diaspora_diaspora\app\views\devise\passwords\new.mobile.haml
+diaspora_diaspora\app\views\home\default.haml
+diaspora_diaspora\app\views\home\show.haml
+diaspora_diaspora\app\views\people\_index.html.haml
+diaspora_diaspora\app\views\photos\_index.mobile.haml
+diaspora_diaspora\app\views\photos\_new_profile_photo.haml
+diaspora_diaspora\app\views\photos\edit.html.haml
+diaspora_diaspora\app\views\photos\show.mobile.haml
+diaspora_diaspora\app\views\profiles\_edit_private.haml
+diaspora_diaspora\app\views\profiles\_edit_public.haml
+diaspora_diaspora\app\views\profiles\edit.haml
+diaspora_diaspora\app\views\profiles\edit.mobile.haml
+diaspora_diaspora\app\views\publisher\_publisher.html.haml
+diaspora_diaspora\app\views\shared\_right_sections.html.haml
+diaspora_diaspora\app\views\shared\_settings_nav.haml
+diaspora_diaspora\app\views\shared\_stream.haml
+diaspora_diaspora\app\views\streams\main_stream.html.haml
+diaspora_diaspora\app\views\streams\main_stream.mobile.haml
+diaspora_diaspora\app\views\tags\_followed_tags_listings.haml
+diaspora_diaspora\app\views\tags\show.haml
+diaspora_diaspora\app\views\tags\show.mobile.haml
+diaspora_diaspora\app\views\users\_edit.haml
+diaspora_diaspora\app\views\users\edit.html.haml
+diaspora_diaspora\app\views\users\edit.mobile.haml
+

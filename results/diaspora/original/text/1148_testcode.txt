@@ -1,0 +1,203 @@
+Given /^a client with a provided picture exists for user "([^\"]*)"$/ do |email|
+  app = FactoryGirl.create(:o_auth_application_with_image)
+  user = User.find_by(email: email)
+  FactoryGirl.create(:auth_with_read, user: user, o_auth_application: app)
+end
+Given /^a client exists for user "([^\"]*)"$/ do |email|
+  user = User.find_by(email: email)
+  FactoryGirl.create(:auth_with_read, user: user)
+end
+When /^I register a new client$/ do
+  post api_openid_connect_clients_path, redirect_uris: ["http://localhost:3000"], client_name: "diaspora client"
+end
+Then /^I should receive "([^\"]*)"'s id, username, and email$/ do |username|
+  user_info_json = JSON.parse(last_response.body)
+  user = User.find_by_username(username)
+  user_profile_url = File.join(AppConfig.environment.url, "people", user.guid).to_s
+  expect(user_info_json["profile"]).to have_content(user_profile_url)
+end
+Then(/^I should see a message containing "(.*?)"$/) do |message|
+  expect(find("#openid_connect_error_description").text).to include(message)
+end
+Given /^I send a post request from that client to the authorization endpoint$/ do
+  client_json = JSON.parse(last_response.body)
+  visit new_api_openid_connect_authorization_path(O_AUTH_QUERY_PARAMS.merge(client_id: client_json["client_id"]))
+end
+Given /^I have signed in (\d+) minutes ago$/ do |minutes|
+  @me.update_attribute(:current_sign_in_at, Time.zone.now - minutes.to_i.minute)
+end
+Given /^I send a post request from that client to the authorization endpoint with max age$/ do
+  client_json = JSON.parse(last_response.body)
+  visit new_api_openid_connect_authorization_path(
+    O_AUTH_QUERY_PARAMS_WITH_MAX_AGE.merge(client_id: client_json["client_id"]))
+end
+Given /^I send a post request from that client to the authorization endpoint using a invalid client id$/ do
+  visit new_api_openid_connect_authorization_path(O_AUTH_QUERY_PARAMS.merge(client_id: "randomid"))
+end
+When /^I give my consent and authorize the client$/ do
+  click_button "Approve"
+end
+When /^I deny authorization to the client$/ do
+  click_button "Deny"
+end
+Then /^I should not see any tokens in the redirect url$/ do
+  access_token = current_url[/(?<=access_token=)[^&]+/]
+  id_token = current_url[/(?<=access_token=)[^&]+/]
+  expect(access_token).to eq(nil)
+  expect(id_token).to eq(nil)
+end
+When /^I parse the bearer tokens and use it to access user info$/ do
+  access_token = current_url[/(?<=access_token=)[^&]+/]
+  get api_openid_connect_user_info_path, access_token: access_token
+end
+When /^I (?:sign|log) in as "([^"]*)"$/ do |email|
+  @me = User.find_by_email(email)
+  @me.password ||= 'password'
+  automatic_login
+  confirm_login
+end
+  def automatic_login
+    @me ||= FactoryGirl.create(:user_with_aspect, :getting_started => false)
+    visit(new_integration_sessions_path(:user_id => @me.id))
+    click_button "Login"
+  end
+  def confirm_login
+    page.has_content?("#{@me.first_name} #{@me.last_name}")
+  end
+Given /^a user with username "([^\"]*)"$/ do |username|
+  create_user(:email => username + "@" + username + '.' + username, :username => username)
+end
+Given /^(?:|[tT]hat )?following user[s]?(?: exist[s]?)?:$/ do |table|
+  table.hashes.each do |hash|
+    if hash.has_key? "username" and hash.has_key? "email"
+      step %{a user named "#{hash['username']}" with email "#{hash['email']}"}
+    elsif hash.has_key? "username"
+      step %{a user with username "#{hash['username']}"}
+    elsif hash.has_key? "email"
+      step %{a user with email "#{hash['email']}"}
+    end
+  end
+end
+Given /^I send a post request from that client to the code flow authorization endpoint$/ do
+  client_json = JSON.parse(last_response.body)
+  @client_id = client_json["client_id"]
+  @client_secret = client_json["client_secret"]
+  params = O_AUTH_QUERY_PARAMS_WITH_CODE.merge(client_id: @client_id)
+  visit new_api_openid_connect_authorization_path(params)
+end
+Given /^I send a post request from that client to the code flow authorization endpoint using a invalid client id/ do
+  params = O_AUTH_QUERY_PARAMS_WITH_CODE.merge(client_id: "randomid")
+  visit new_api_openid_connect_authorization_path(params)
+end
+When /^I parse the auth code and create a request to the token endpoint$/ do
+  code = current_url[/(?<=code=)[^&]+/]
+  post api_openid_connect_access_tokens_path, code: code,
+       redirect_uri: "http://localhost:3000", grant_type: "authorization_code",
+       client_id: @client_id, client_secret: @client_secret
+end
+When /^I parse the tokens and use it obtain user info$/ do
+  client_json = JSON.parse(last_response.body)
+  access_token = client_json["access_token"]
+  encoded_id_token = client_json["id_token"]
+  decoded_token = OpenIDConnect::ResponseObject::IdToken.decode encoded_id_token,
+                                                                Api::OpenidConnect::IdTokenConfig::PUBLIC_KEY
+  expect(decoded_token.sub).to eq(@me.diaspora_handle)
+  get api_openid_connect_user_info_path, access_token: access_token
+end
+When /^(?:|I )go to (.+)$/ do |page_name|
+  navigate_to(page_name)
+end
+  def navigate_to(page_name)
+    path = path_to(page_name)
+    if path.is_a?(Hash)
+      visit(path[:path])
+      await_elem = path[:special_elem]
+      find(await_elem.delete(:selector), await_elem)
+    else
+      visit(path)
+    end
+  end
+  def path_to(page_name)
+    case page_name
+    when /^person_photos page$/
+      person_photos_path(@me.person)
+    when /^the home(?: )?page$/
+      stream_path
+    when /^the mobile path$/
+      force_mobile_path
+    when /^the user applications page$/
+      api_openid_connect_user_applications_path
+    when /^the tag page for "([^\"]*)"$/
+      tag_path(Regexp.last_match(1))
+    when /^its ([\w ]+) page$/
+      send("#{Regexp.last_match(1).gsub(/\W+/, '_')}_path", @it)
+    when /^the mobile ([\w ]+) page$/
+      public_send("#{Regexp.last_match(1).gsub(/\W+/, '_')}_path", format: "mobile")
+    when /^the ([\w ]+) page$/
+      public_send("#{Regexp.last_match(1).gsub(/\W+/, '_')}_path")
+    when /^my edit profile page$/
+      edit_profile_path
+    when /^my profile page$/
+      person_path(@me.person)
+    when /^my acceptance form page$/
+      invite_code_path(InvitationCode.first)
+    when /^the requestors profile$/
+      person_path(Request.where(recipient_id: @me.person.id).first.sender)
+    when /^"([^\"]*)"'s page$/
+      p = User.find_by_email(Regexp.last_match(1)).person
+      {path:         person_path(p),
+       # '#diaspora_handle' on desktop, '.description' on mobile
+       special_elem: {selector: "#diaspora_handle, .description", text: p.diaspora_handle}
+      }
+    when /^"([^\"]*)"'s photos page$/
+      p = User.find_by_email(Regexp.last_match(1)).person
+      person_photos_path p
+    when /^my account settings page$/
+      edit_user_path
+    when /^forgot password page$/
+      new_user_password_path
+    when %r{^"(/.*)"}
+      Regexp.last_match(1)
+    else
+      raise "Can't find mapping from \"#{page_name}\" to a path."
+    end
+  end
+Then /^I should see (\d+) authorized applications$/ do |num|
+  expect(page).to have_selector(".applications-page", count: 1)
+  expect(page).to have_selector(".authorized-application", count: num.to_i)
+end
+Then /^I should see (\d+) authorized applications with no provided image$/ do |num|
+  expect(page).to have_selector(".application-img > .entypo-browser", count: num.to_i)
+end
+Then /^I should see (\d+) authorized applications with an image$/ do |num|
+  expect(page).to have_selector(".application-img > .img-responsive", count: num.to_i)
+end
+When /^I revoke the first authorization$/ do
+  find(".app-revoke", match: :first).click
+end
+Given /^a user with email "([^\"]*)"$/ do |email|
+  create_user(:email => email)
+end
+Given /^a user with username "([^\"]*)"$/ do |username|
+  create_user(:email => username + "@" + username + '.' + username, :username => username)
+end
+Given /^a user named "([^\"]*)" with email "([^\"]*)"$/ do |name, email|
+  first, last = name.split
+  user = create_user(:email => email, :username => "#{first}_#{last}")
+  user.profile.update_attributes!(:first_name => first, :last_name => last) if first
+end
+  def create_user(overrides={})
+    default_attrs = {
+        :password => 'password',
+        :password_confirmation => 'password',
+        :getting_started => false
+    }
+
+    user = FactoryGirl.create(:user, default_attrs.merge(overrides))
+    add_standard_aspects(user)
+    user
+  end
+  def add_standard_aspects(user)
+    user.aspects.create(:name => "Besties")
+    user.aspects.create(:name => "Unicorns")
+  end

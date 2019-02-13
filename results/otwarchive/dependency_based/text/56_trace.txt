@@ -1,0 +1,6 @@
+[path:\features\step_definitions\collection_steps.rb, methods:[42, 88]]
+[path:\features\step_definitions\generic_steps.rb, methods:[192, 187]]
+[path:\features\step_definitions\tag_steps.rb, methods:[37, 82, 7]]
+[path:\features\step_definitions\user_steps.rb, methods:[45, 64, 112]]
+[path:\features\step_definitions\web_steps.rb, methods:[22, 32, 69, 26, 106, 158, [name:with_scope, step:When ], [name:with_scope, step:Then ]]]
+[path:\features\step_definitions\work_steps.rb, methods:[50, 35, 11, 243]]

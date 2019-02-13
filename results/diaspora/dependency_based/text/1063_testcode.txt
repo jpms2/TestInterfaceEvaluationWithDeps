@@ -1,0 +1,134 @@
+When /^I (?:sign|log) in manually as "([^"]*)" with password "([^"]*)" on the mobile website$/ do |username, password|
+  @me = User.find_by_username(username)
+  @me.password ||= password
+  manual_login
+  confirm_login_mobile
+end
+When /^I (?:log|sign) out manually on the mobile website$/ do
+  manual_logout_mobile
+end
+Then (/^I should see the 'getting started' contents$/) do
+  confirm_getting_started_contents
+end
+  def manual_login
+    visit login_page
+    login_as @me.username, @me.password
+  end
+  def confirm_login_mobile
+    page.has_css?("#notification_badge")
+  end
+  def manual_logout_mobile
+    find("#menu-badge").click
+    find("#drawer ul li:last-child a").click
+  end
+  def confirm_getting_started_contents
+    expect(page).to have_content("Well, hello there!")
+    expect(page).to have_content("Who are you?")
+    expect(page).to have_content("What are you into?")
+
+    # the username that was just entered for registration
+    expect(page).to have_field("profile_first_name", with: @username)
+  end
+  def login_page
+    path_to "the new user session page"
+  end
+  def login_as(user, pass)
+    fill_in 'user_username', :with=>user
+    fill_in 'user_password', :with=>pass
+    click_button "Sign in"
+  end
+  def path_to(page_name)
+    case page_name
+    when /^person_photos page$/
+      person_photos_path(@me.person)
+    when /^the home(?: )?page$/
+      stream_path
+    when /^the mobile path$/
+      force_mobile_path
+    when /^the user applications page$/
+      api_openid_connect_user_applications_path
+    when /^the tag page for "([^\"]*)"$/
+      tag_path(Regexp.last_match(1))
+    when /^its ([\w ]+) page$/
+      send("#{Regexp.last_match(1).gsub(/\W+/, '_')}_path", @it)
+    when /^the mobile ([\w ]+) page$/
+      public_send("#{Regexp.last_match(1).gsub(/\W+/, '_')}_path", format: "mobile")
+    when /^the ([\w ]+) page$/
+      public_send("#{Regexp.last_match(1).gsub(/\W+/, '_')}_path")
+    when /^my edit profile page$/
+      edit_profile_path
+    when /^my profile page$/
+      person_path(@me.person)
+    when /^my acceptance form page$/
+      invite_code_path(InvitationCode.first)
+    when /^the requestors profile$/
+      person_path(Request.where(recipient_id: @me.person.id).first.sender)
+    when /^"([^\"]*)"'s page$/
+      p = User.find_by_email(Regexp.last_match(1)).person
+      {path:         person_path(p),
+       # '#diaspora_handle' on desktop, '.description' on mobile
+       special_elem: {selector: "#diaspora_handle, .description", text: p.diaspora_handle}
+      }
+    when /^"([^\"]*)"'s photos page$/
+      p = User.find_by_email(Regexp.last_match(1)).person
+      person_photos_path p
+    when /^my account settings page$/
+      edit_user_path
+    when /^forgot password page$/
+      new_user_password_path
+    when %r{^"(/.*)"}
+      Regexp.last_match(1)
+    else
+      raise "Can't find mapping from \"#{page_name}\" to a path."
+    end
+  end
+Given /^(?:|I )am on (.+)$/ do |page_name|
+  navigate_to(page_name)
+end
+When /^(?:|I )follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
+  with_scope(selector) do
+    click_link(link)
+  end
+end
+Then /^(?:|I )should be on (.+)$/ do |page_name|
+  confirm_on_page(page_name)
+end
+  def navigate_to(page_name)
+    path = path_to(page_name)
+    if path.is_a?(Hash)
+      visit(path[:path])
+      await_elem = path[:special_elem]
+      find(await_elem.delete(:selector), await_elem)
+    else
+      visit(path)
+    end
+  end
+  def confirm_on_page(page_name)
+    expect(page).to have_path(path_to(page_name))
+  end
+  def with_scope(locator)
+    if locator
+      within(locator, match: :first) do
+        yield
+      end
+    else
+      yield
+    end
+  end
+When /^I fill in the new user form/ do
+  fill_in_new_user_form
+end
+  def fill_in_new_user_form
+    @username = "ohai"
+    fill_in('user_username', with: @username)
+    fill_in('user_email', with: "#{@username}@example.com")
+    fill_in('user_password', with: 'secret')
+    fill_in('user_password_confirmation', with: 'secret')
+
+    # captcha needs to be filled out, because the field is required (HTML5)
+    # in test env, the captcha will always pass successfully
+    fill_in('user_captcha', with: '123456')
+  end
+And /^I submit the form$/ do
+  find("input[type='submit']").click
+end

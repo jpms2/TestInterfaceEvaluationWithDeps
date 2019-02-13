@@ -1,0 +1,413 @@
+Feature: Import Works
+In order to have an archive full of works
+As an author
+I want to create new works by importing them
+Scenario: Creating a new minimally valid work
+When I set up importing with a mock website
+Then I should see "Import New Work"
+When I fill in "urls" with "http://import-site-without-tags"
+And I press "Import"
+Then I should see "Preview"
+And I should see "Untitled Imported Work"
+And I should not see "A work has already been imported from http://import-site-without-tags"
+And I should see "No Fandom"
+And I should see "Chose Not To"
+And I should see "Not Rated"
+When I press "Post"
+Then I should see "Work was successfully posted."
+When I go to the works page
+Then I should see "Untitled Imported Work"
+Scenario: With override disabled and tag detection enabled, tags should be detected
+When I start importing "http://import-site-with-tags" with a mock website
+And I select "Explicit" from "Rating"
+And I check "No Archive Warnings Apply"
+And I fill in "Fandoms" with "Idol RPF"
+And I check "M/M"
+And I fill in "Relationships" with "Adam/Kris"
+And I fill in "Characters" with "Adam Lambert, Kris Allen"
+And I fill in "Additional Tags" with "kinkmeme"
+And I fill in "Notes at the beginning" with "This is a <i>note</i>"
+When I press "Import"
+Then I should see "Preview"
+And I should see "Detected Title"
+And I should see "Explicit"
+And I should see "Archive Warning: Underage"
+And I should see "Fandom: Detected Fandom"
+And I should see "Category: M/M"
+And I should see "Relationship: Detected 1/Detected 2"
+And I should see "Characters: Detected 1Detected 2"
+And I should see "Additional Tags: Detected tag 1Detected tag 2"
+And I should see "Notes: This is a content note."
+When I press "Post"
+Then I should see "Work was successfully posted."
+Scenario: With override and tag detection enabled, provided tags should be used when tags are entered
+When I start importing "http://import-site-with-tags" with a mock website
+And I check "override_tags"
+And I choose "detect_tags_true"
+And I select "Mature" from "Rating"
+And I check "No Archive Warnings Apply"
+And I fill in "Fandoms" with "Idol RPF"
+And I check "F/M"
+And I fill in "Relationships" with "Adam/Kris"
+And I fill in "Characters" with "Adam Lambert, Kris Allen"
+And I fill in "Additional Tags" with "kinkmeme"
+And I fill in "Notes at the beginning" with "This is a <i>note</i>"
+When I press "Import"
+Then I should see "Preview"
+And I should see "Detected Title"
+And I should see "Rating: Mature"
+And I should see "Archive Warning: No Archive Warnings"
+And I should see "Fandom: Idol RPF"
+And I should see "Category: F/M"
+And I should see "Relationship: Adam/Kris"
+And I should see "Characters: Adam LambertKris Allen"
+And I should see "Additional Tags: kinkmeme"
+And I should see "Notes: This is a note"
+When I press "Post"
+Then I should see "Work was successfully posted."
+Scenario: With override and tag detection enabled, both provided and detected tags should be used when not all tags are entered
+When I start importing "http://import-site-with-tags" with a mock website
+And I check "override_tags"
+And I choose "detect_tags_true"
+And I select "Mature" from "Rating"
+And I check "No Archive Warnings Apply"
+And I fill in "Characters" with "Adam Lambert, Kris Allen"
+And I fill in "Additional Tags" with "kinkmeme"
+And I fill in "Notes at the beginning" with "This is a <i>note</i>"
+When I press "Import"
+Then I should see "Preview"
+And I should see "Detected Title"
+And I should see "Rating: Mature"
+And I should see "Archive Warning: No Archive Warnings"
+And I should see "Fandom: Detected Fandom"
+And I should see "Relationship: Detected 1/Detected 2"
+And I should see "Characters: Adam LambertKris Allen"
+And I should see "Additional Tags: kinkmeme"
+And I should see "Notes: This is a note"
+And I should not see "Category: M/M"
+When I press "Post"
+Then I should see "Work was successfully posted."
+Scenario: Default tags should be used when no tags are entered, and override is enabled and tag detection is disabled
+When I start importing "http://import-site-with-tags" with a mock website
+And I check "override_tags"
+And I choose "detect_tags_false"
+When I press "Import"
+Then I should see "Detected Title"
+And I should see "Rating: Not Rated"
+And I should see "Archive Warning: Creator Chose Not To Use Archive Warnings"
+And I should see "Fandom: No Fandom"
+And I should not see "Relationship:"
+And I should not see "Additional Tags:"
+And I should not see "Relationship: Detected 1/Detected 2"
+Feature: Subscriptions
+In order to follow a fandom I like
+As a reader
+I want to subscribe to it
+Scenario: Subscribe to a test fandom when there are no works in it
+When I am logged in as "author"
+And I post a work "My Work Title" with category "F/M"
+When I am logged in as "reader"
+And I view the "F/F" works index
+Then I should see "RSS Feed"
+Feature: Import Works from DW
+In order to have an archive full of works
+As an author
+I want to create new works by importing them from DW
+@import_dw_tables_no_backdate
+Scenario: Creating a new work from an DW story without backdating it
+Given basic tags
+And the following activated user exists
+| login          | password    |
+| cosomeone      | something   |
+And I am logged in as a random user
+When I go to the import page
+And I fill in "urls" with "http://rebecca2525.dreamwidth.org/3506.html"
+When I press "Import"
+Then I should see "Preview"
+And I should see "Importing Test"
+When I press "Edit"
+Then I should see "* Required information"
+And I should see "Importing Test"
+When I set the publication date to today
+And I check "No Archive Warnings Apply"
+When I press "Preview"
+Then I should see "Importing Test"
+When I press "Post"
+Then I should see "Work was successfully posted."
+And I should see "Importing Test" within "h2.title"
+And I should not see the image "alt" text "Add to memories!"
+And I should not see the image "alt" text "Next Entry"
+Feature: Import Works from LJ
+In order to have an archive full of works
+As an author
+I want to create new works by importing them from LJ
+@import_lj_no_backdate
+Scenario: Creating a new work from an LJ story without backdating it
+Given basic tags
+And I am logged in as a random user
+When I go to the import page
+And I fill in "urls" with "http://rebecca2525.livejournal.com/3562.html"
+When I press "Import"
+Then I should see "Preview"
+And I should see "Importing Test"
+When I press "Edit"
+Then I should see "* Required information"
+And I should see "Importing Test"
+When I set the publication date to today
+And I check "No Archive Warnings Apply"
+When I press "Preview"
+Then I should see "Importing Test"
+When I press "Post"
+Then I should see "Work was successfully posted."
+And I should see "Importing Test" within "h2.title"
+And I should not see the image "alt" text "Add to memories!"
+And I should not see the image "alt" text "Next Entry"
+Feature: Create Works
+In order to have an archive full of works
+As an author
+I want to create new works
+Scenario: Creating a new work with everything filled in, and we do mean everything
+Given basic tags
+And the following activated users exist
+| login          | password    | email                 |
+| coauthor       | something   | coauthor@example.org  |
+| cosomeone      | something   | cosomeone@example.org |
+| giftee         | something   | giftee@example.org    |
+| recipient      | something   | recipient@example.org |
+And I have a collection "Collection 1" with name "collection1"
+And I have a collection "Collection 2" with name "collection2"
+And I am logged in as "thorough" with password "something"
+And "thorough" creates the pseud "Pseud2"
+And "thorough" creates the pseud "Pseud3"
+And all emails have been delivered
+When I go to the new work page
+And I select "Not Rated" from "Rating"
+And I check "No Archive Warnings Apply"
+And I check "F/M"
+And I fill in "Fandoms" with "Supernatural"
+And I fill in "Work Title" with "All Something Breaks Loose"
+And I fill in "content" with "Bad things happen, etc."
+And I check "front-notes-options-show"
+And I fill in "work_notes" with "This is my beginning note"
+And I fill in "work_endnotes" with "This is my endingnote"
+And I fill in "Summary" with "Have a short summary"
+And I fill in "Characters" with "Sam Winchester, Dean Winchester,"
+And I fill in "Relationships" with "Harry/Ginny"
+And I fill in "Additional Tags" with "An extra tag"
+And I fill in "Gift this work to" with "Someone else, recipient"
+And I check "series-options-show"
+And I fill in "work_series_attributes_title" with "My new series"
+And I select "Pseud2" from "work_author_attributes_ids_"
+And I select "Pseud3" from "work_author_attributes_ids_"
+And I fill in "pseud_byline" with "coauthor"
+And I fill in "Post to Collections / Challenges" with "collection1, collection2"
+And I press "Preview"
+Then I should see "Draft was successfully created"
+When I press "Post"
+Then I should see "Work was successfully posted."
+And 2 emails should be delivered to "coauthor@example.org"
+And the email should contain "You have been listed as a coauthor"
+And 1 email should be delivered to "recipient@example.org"
+And the email should contain "A gift work has been posted for you"
+When I go to the works page
+Then I should see "All Something Breaks Loose"
+When I follow "All Something Breaks Loose"
+Then I should see "All Something Breaks Loose"
+And I should see "Fandom: Supernatural"
+And I should see "Rating: Not Rated"
+And I should see "No Archive Warnings Apply"
+And I should not see "Choose Not To Use Archive Warnings"
+And I should see "Category: F/M"
+And I should see "Characters: Sam Winchester, Dean Winchester"
+And I should see "Relationship: Harry/Ginny"
+And I should see "Additional Tags: An extra tag"
+And I should see "For Someone else, recipient"
+And I should see "Collections: Collection 1, Collection 2"
+And I should see "Notes"
+And I should see "This is my beginning note"
+And I should see "See the end of the work for more notes"
+And I should see "This is my endingnote"
+And I should see "Summary"
+And I should see "Have a short summary"
+And I should see "Pseud2" within ".byline"
+And I should see "Pseud3" within ".byline"
+And I should see "My new series"
+And I should see "Bad things happen, etc."
+When I follow "Add Chapter"
+And I fill in "Chapter Title" with "This is my second chapter"
+And I fill in "content" with "Let's write another story"
+And I press "Preview"
+Then I should see "Chapter 2: This is my second chapter"
+And I should see "Let's write another story"
+When I press "Post"
+Then I should see "All Something Breaks Loose"
+And I should not see "Bad things happen, etc."
+And I should see "Let's write another story"
+When I follow "Previous Chapter"
+And I should see "Bad things happen, etc."
+When I follow "Entire Work"
+Then I should see "Bad things happen, etc."
+And I should see "Let's write another story"
+When I follow "Edit"
+And I check "co-authors-options-show"
+And I fill in "pseud_byline" with "Does_not_exist"
+And I press "Preview"
+Then I should see "Please verify the names of your co-authors"
+And I should see "These pseuds are invalid: Does_not_exist"
+When all emails have been delivered
+And I fill in "pseud_byline" with "cosomeone"
+When "autocomplete tests with JavaScript" is fixed
+When I press "Preview"
+And I press "Update"
+Then I should see "Work was successfully updated"
+And I should see "cosomeone" within ".byline"
+And I should see "coauthor" within ".byline"
+And I should see "Pseud2" within ".byline"
+And I should see "Pseud3" within ".byline"
+And 1 email should be delivered to "cosomeone@example.org"
+When all emails have been delivered
+And I follow "Edit"
+And I give the work to "giftee"
+And I press "Preview"
+And I press "Update"
+Then I should see "Work was successfully updated"
+And I should see "For giftee"
+And 1 email should be delivered to "giftee@example.org"
+When I go to giftee's user page
+Then I should see "Gifts (1)"
+Feature: Delete Works
+Check that everything disappears correctly when deleting a work
+Scenario: Deleting a work with everything filled in, and we do mean everything
+Given basic tags
+And the following activated users exist
+| login          | password    | email                 |
+| coauthor       | something   | coauthor@example.org  |
+| cosomeone      | something   | cosomeone@example.org |
+| giftee         | something   | giftee@example.org    |
+| recipient      | something   | recipient@example.org |
+And I have a collection "Collection 1" with name "collection1"
+And I have a collection "Collection 2" with name "collection2"
+And I am logged in as "thorough"
+And I add the pseud "Pseud2"
+And I add the pseud "Pseud3"
+When I go to the new work page
+And all emails have been delivered
+And I select "Not Rated" from "Rating"
+And I check "No Archive Warnings Apply"
+And I check "F/M"
+And I fill in "Fandoms" with "Supernatural"
+And I fill in "Work Title" with "All Something Breaks Loose"
+And I fill in "content" with "Bad things happen, etc."
+And I check "front-notes-options-show"
+And I fill in "work_notes" with "This is my beginning note"
+And I fill in "work_endnotes" with "This is my endingnote"
+And I fill in "Summary" with "Have a short summary"
+And I fill in "Characters" with "Sam Winchester, Dean Winchester,"
+And I fill in "Relationships" with "Harry/Ginny"
+And I fill in "Gift this work to" with "Someone else, recipient"
+And I check "series-options-show"
+And I fill in "work_series_attributes_title" with "My new series"
+And I select "Pseud2" from "work_author_attributes_ids_"
+And I select "Pseud3" from "work_author_attributes_ids_"
+And I fill in "pseud_byline" with "coauthor"
+And I fill in "work_collection_names" with "collection1, collection2"
+And I press "Preview"
+Then I should see "Preview"
+When I press "Post"
+Then I should see "Work was successfully posted."
+And 2 email should be delivered to "coauthor@example.org"
+And the email should contain "You have been listed as a coauthor"
+And 1 email should be delivered to "recipient@example.org"
+And the email should contain "A gift work has been posted for you"
+When I go to the works page
+Then I should see "All Something Breaks Loose"
+When I follow "All Something Breaks Loose"
+Then I should see "All Something Breaks Loose"
+And I should see "Fandom: Supernatural"
+And I should see "Rating: Not Rated"
+And I should see "No Archive Warnings Apply"
+And I should not see "Choose Not To Use Archive Warnings"
+And I should see "Category: F/M"
+And I should see "Characters: Sam Winchester, Dean Winchester"
+And I should see "Relationship: Harry/Ginny"
+And I should see "For Someone else, recipient"
+And I should see "Collections: Collection 1, Collection 2"
+And I should see "Notes"
+And I should see "This is my beginning note"
+And I should see "See the end of the work for more notes"
+And I should see "This is my endingnote"
+And I should see "Summary"
+And I should see "Have a short summary"
+And I should see "Pseud2" within ".byline"
+And I should see "Pseud3" within ".byline"
+And I should see "My new series"
+And I should see "Bad things happen, etc."
+When I follow "Add Chapter"
+And I fill in "Chapter Title" with "This is my second chapter"
+And I fill in "content" with "Let's write another story"
+And I press "Preview"
+Then I should see "Chapter 2: This is my second chapter"
+And I should see "Let's write another story"
+When I press "Post"
+Then I should see "All Something Breaks Loose"
+And I should see "Chapter 1"
+And I should not see "Bad things happen, etc."
+And I should see "Let's write another story"
+When I follow "Previous Chapter"
+Then I should see "Bad things happen, etc."
+And I should not see "Let's write another story"
+When I follow "Entire Work"
+Then I should see "Bad things happen, etc."
+And I should see "Let's write another story"
+When I follow "Edit"
+And I check "co-authors-options-show"
+And I fill in "pseud_byline" with "Does_not_exist"
+And I press "Preview"
+Then I should see "Please verify the names of your co-authors"
+And I should see "These pseuds are invalid: Does_not_exist"
+When all emails have been delivered
+And I fill in "pseud_byline" with "cosomeone"
+When "autocomplete tests with JavaScript" is fixed
+When I press "Preview"
+And I press "Update"
+Then I should see "Work was successfully updated"
+And I should see "cosomeone" within ".byline"
+And I should see "coauthor" within ".byline"
+And I should see "Pseud2" within ".byline"
+And I should see "Pseud3" within ".byline"
+And 1 email should be delivered to "cosomeone@example.org"
+When all emails have been delivered
+And I follow "Edit"
+And I give the work to "giftee"
+And I press "Preview"
+And I press "Update"
+Then I should see "Work was successfully updated"
+And I should see "For giftee"
+When I am logged in as "someone_else" with password "something"
+And I view the work "All Something Breaks Loose"
+And I press "Kudos"
+Then I should see "someone_else left kudos on this work!"
+When I follow "Bookmark"
+And I fill in "Notes" with "My thoughts on the work"
+And I press "Create"
+Then I should see "Bookmark was successfully created"
+When I go to the bookmarks page
+Then I should see "All Something Breaks Loose"
+When I am logged in as "thorough" with password "something"
+And I go to giftee's user page
+Then I should see "Gifts (1)"
+When I delete the work "All Something Breaks Loose"
+Then I should see "Your work All Something Breaks Loose was deleted."
+When I go to giftee's user page
+Then I should see "Gifts (0)"
+And I should not see "All Something Breaks Loose"
+When I go to cosomeone's user page
+Then I should not see "All Something Breaks Loose"
+When I go to thorough's user page
+Then I should not see "All Something Breaks Loose"
+When I go to the bookmarks page
+Then I should not see "All Something Breaks Loose"
+When I go to someone_else's bookmarks page
+Then I should not see "All Something Breaks Loose"
+And I should see "This has been deleted, sorry!"
+And I should see "My thoughts on the work"

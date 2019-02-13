@@ -1,0 +1,170 @@
+Classes: 20
+[name:ActionMailer, file:null, step:Given ]
+[name:Admin, file:otwcode_otwarchive\app\models\admin.rb, step:Given ]
+[name:Admin, file:otwcode_otwarchive\factories\admin.rb, step:Given ]
+[name:AdminPost, file:otwcode_otwarchive\app\models\admin_post.rb, step:null]
+[name:AdminPost, file:otwcode_otwarchive\factories\admin_post.rb, step:null]
+[name:AdminPostsController, file:otwcode_otwarchive\app\controllers\admin_posts_controller.rb, step:null]
+[name:AdminSession, file:otwcode_otwarchive\app\models\admin_session.rb, step:null]
+[name:AdminSession, file:otwcode_otwarchive\app\models\admin_session.rb, step:Given ]
+[name:DEFAULT_PASSWORD, file:null, step:Given ]
+[name:FactoryGirl, file:null, step:Given ]
+[name:Feedback, file:otwcode_otwarchive\app\models\feedback.rb, step:null]
+[name:Feedback, file:otwcode_otwarchive\factories\feedback.rb, step:null]
+[name:InviteRequest, file:otwcode_otwarchive\app\models\invite_request.rb, step:null]
+[name:KnownIssue, file:otwcode_otwarchive\app\models\known_issue.rb, step:null]
+[name:User, file:otwcode_otwarchive\app\models\user.rb, step:When ]
+[name:User, file:otwcode_otwarchive\app\models\user.rb, step:Given ]
+[name:UserSession, file:otwcode_otwarchive\app\models\user_session.rb, step:Given ]
+[name:UserSession, file:otwcode_otwarchive\app\models\user_session.rb, step:null]
+[name:UserSessionsController, file:otwcode_otwarchive\app\controllers\user_sessions_controller.rb, step:null]
+[name:feedbacks_controller, file:otwcode_otwarchive\app\controllers\feedbacks_controller.rb, step:null]
+
+Methods: 111
+[name:activate, type:AdminUsersController, file:otwcode_otwarchive\app\controllers\admin\admin_users_controller.rb, step:Given ]
+[name:activate, type:UsersController, file:otwcode_otwarchive\app\controllers\users_controller.rb, step:Given ]
+[name:activate, type:User, file:otwcode_otwarchive\app\models\user.rb, step:Given ]
+[name:be_empty, type:Object, file:null, step:Given ]
+[name:be_nil, type:Object, file:null, step:Then ]
+[name:blank?, type:Prompt, file:otwcode_otwarchive\app\models\prompt.rb, step:Given ]
+[name:capture_email, type:Object, file:null, step:Then ]
+[name:capture_fields, type:Object, file:null, step:Then ]
+[name:capture_fields, type:Object, file:null, step:Given ]
+[name:capture_model, type:Object, file:null, step:Given ]
+[name:clear, type:ReadingsController, file:otwcode_otwarchive\app\controllers\readings_controller.rb, step:Given ]
+[name:click_button, type:Object, file:null, step:Given ]
+[name:click_button, type:Object, file:null, step:When ]
+[name:click_link, type:Object, file:null, step:When ]
+[name:count, type:Rawk, file:otwcode_otwarchive\lib\tasks\rawk.rb, step:Given ]
+[name:count, type:WordCounter, file:otwcode_otwarchive\lib\word_counter.rb, step:Given ]
+[name:count_visible_comments, type:AdminPost, file:otwcode_otwarchive\app\models\admin_post.rb, step:null]
+[name:count_visible_comments, type:AdminPost, file:otwcode_otwarchive\factories\admin_post.rb, step:null]
+[name:create, type:AbuseReportsController, file:otwcode_otwarchive\app\controllers\abuse_reports_controller.rb, step:Given ]
+[name:create, type:AdminInvitationsController, file:otwcode_otwarchive\app\controllers\admin\admin_invitations_controller.rb, step:Given ]
+[name:create, type:ApiController, file:otwcode_otwarchive\app\controllers\admin\api_controller.rb, step:Given ]
+[name:create, type:BannersController, file:otwcode_otwarchive\app\controllers\admin\banners_controller.rb, step:Given ]
+[name:create, type:BlacklistedEmailsController, file:otwcode_otwarchive\app\controllers\admin\blacklisted_emails_controller.rb, step:Given ]
+[name:create, type:AdminPostsController, file:otwcode_otwarchive\app\controllers\admin_posts_controller.rb, step:Given ]
+[name:create, type:AdminSessionsController, file:otwcode_otwarchive\app\controllers\admin_sessions_controller.rb, step:Given ]
+[name:create, type:BookmarksController, file:otwcode_otwarchive\app\controllers\api\v1\bookmarks_controller.rb, step:Given ]
+[name:create, type:WorksController, file:otwcode_otwarchive\app\controllers\api\v1\works_controller.rb, step:Given ]
+[name:create, type:ArchiveFaqsController, file:otwcode_otwarchive\app\controllers\archive_faqs_controller.rb, step:Given ]
+[name:create, type:BookmarksController, file:otwcode_otwarchive\app\controllers\bookmarks_controller.rb, step:Given ]
+[name:create, type:GiftExchangeController, file:otwcode_otwarchive\app\controllers\challenge\gift_exchange_controller.rb, step:Given ]
+[name:create, type:PromptMemeController, file:otwcode_otwarchive\app\controllers\challenge\prompt_meme_controller.rb, step:Given ]
+[name:create, type:ChallengeClaimsController, file:otwcode_otwarchive\app\controllers\challenge_claims_controller.rb, step:Given ]
+[name:create, type:ChallengeSignupsController, file:otwcode_otwarchive\app\controllers\challenge_signups_controller.rb, step:Given ]
+[name:create, type:ChaptersController, file:otwcode_otwarchive\app\controllers\chapters_controller.rb, step:Given ]
+[name:create, type:CollectionItemsController, file:otwcode_otwarchive\app\controllers\collection_items_controller.rb, step:Given ]
+[name:create, type:CollectionsController, file:otwcode_otwarchive\app\controllers\collections_controller.rb, step:Given ]
+[name:create, type:CommentsController, file:otwcode_otwarchive\app\controllers\comments_controller.rb, step:Given ]
+[name:create, type:ExternalAuthorsController, file:otwcode_otwarchive\app\controllers\external_authors_controller.rb, step:Given ]
+[name:create, type:FavoriteTagsController, file:otwcode_otwarchive\app\controllers\favorite_tags_controller.rb, step:Given ]
+[name:create, type:FeedbacksController, file:otwcode_otwarchive\app\controllers\feedbacks_controller.rb, step:Given ]
+[name:create, type:InvitationsController, file:otwcode_otwarchive\app\controllers\invitations_controller.rb, step:Given ]
+[name:create, type:InviteRequestsController, file:otwcode_otwarchive\app\controllers\invite_requests_controller.rb, step:Given ]
+[name:create, type:KnownIssuesController, file:otwcode_otwarchive\app\controllers\known_issues_controller.rb, step:Given ]
+[name:create, type:KudosController, file:otwcode_otwarchive\app\controllers\kudos_controller.rb, step:Given ]
+[name:create, type:LanguagesController, file:otwcode_otwarchive\app\controllers\languages_controller.rb, step:Given ]
+[name:create, type:LocalesController, file:otwcode_otwarchive\app\controllers\locales_controller.rb, step:Given ]
+[name:create, type:ExternalAuthorsController, file:otwcode_otwarchive\app\controllers\opendoors\external_authors_controller.rb, step:Given ]
+[name:create, type:OrphansController, file:otwcode_otwarchive\app\controllers\orphans_controller.rb, step:Given ]
+[name:create, type:OwnedTagSetsController, file:otwcode_otwarchive\app\controllers\owned_tag_sets_controller.rb, step:Given ]
+[name:create, type:PasswordsController, file:otwcode_otwarchive\app\controllers\passwords_controller.rb, step:Given ]
+[name:create, type:PromptsController, file:otwcode_otwarchive\app\controllers\prompts_controller.rb, step:Given ]
+[name:create, type:PseudsController, file:otwcode_otwarchive\app\controllers\pseuds_controller.rb, step:Given ]
+[name:create, type:SeriesController, file:otwcode_otwarchive\app\controllers\series_controller.rb, step:Given ]
+[name:create, type:SkinsController, file:otwcode_otwarchive\app\controllers\skins_controller.rb, step:Given ]
+[name:create, type:SubscriptionsController, file:otwcode_otwarchive\app\controllers\subscriptions_controller.rb, step:Given ]
+[name:create, type:TagSetNominationsController, file:otwcode_otwarchive\app\controllers\tag_set_nominations_controller.rb, step:Given ]
+[name:create, type:TagWranglersController, file:otwcode_otwarchive\app\controllers\tag_wranglers_controller.rb, step:Given ]
+[name:create, type:TagsController, file:otwcode_otwarchive\app\controllers\tags_controller.rb, step:Given ]
+[name:create, type:UserInviteRequestsController, file:otwcode_otwarchive\app\controllers\user_invite_requests_controller.rb, step:Given ]
+[name:create, type:UserSessionsController, file:otwcode_otwarchive\app\controllers\user_sessions_controller.rb, step:Given ]
+[name:create, type:UsersController, file:otwcode_otwarchive\app\controllers\users_controller.rb, step:Given ]
+[name:create, type:WorksController, file:otwcode_otwarchive\app\controllers\works_controller.rb, step:Given ]
+[name:create, type:WranglingGuidelinesController, file:otwcode_otwarchive\app\controllers\wrangling_guidelines_controller.rb, step:Given ]
+[name:create, type:FeedbacksController, file:otwcode_otwarchive\app\controllers\feedbacks_controller.rb, step:null]
+[name:create_model, type:Object, file:null, step:Given ]
+[name:destroy, type:UserSessionsController, file:otwcode_otwarchive\app\controllers\user_sessions_controller.rb, step:null]
+[name:destroy, type:AdminSessionsController, file:otwcode_otwarchive\app\controllers\admin_sessions_controller.rb, step:null]
+[name:destroy_all, type:Object, file:null, step:Given ]
+[name:edit, type:AdminPostsController, file:otwcode_otwarchive\app\controllers\admin_posts_controller.rb, step:null]
+[name:email, type:Object, file:null, step:Then ]
+[name:emails, type:Object, file:null, step:Then ]
+[name:fill_in, type:Object, file:null, step:Given ]
+[name:fill_in, type:Object, file:null, step:When ]
+[name:find, type:UserSession, file:otwcode_otwarchive\app\models\user_session.rb, step:Given ]
+[name:find, type:AdminSession, file:otwcode_otwarchive\app\models\admin_session.rb, step:Given ]
+[name:find_by_login, type:Admin, file:otwcode_otwarchive\app\models\admin.rb, step:Given ]
+[name:find_by_login, type:Admin, file:otwcode_otwarchive\factories\admin.rb, step:Given ]
+[name:find_by_login, type:User, file:otwcode_otwarchive\app\models\user.rb, step:When ]
+[name:find_by_login, type:User, file:otwcode_otwarchive\app\models\user.rb, step:Given ]
+[name:first, type:Object, file:null, step:When ]
+[name:have_content, type:Object, file:null, step:Then ]
+[name:have_content, type:Object, file:null, step:Given ]
+[name:index, type:InviteRequestsController, file:otwcode_otwarchive\app\controllers\invite_requests_controller.rb, step:null]
+[name:index, type:ArchiveFaqsController, file:otwcode_otwarchive\app\controllers\archive_faqs_controller.rb, step:null]
+[name:index, type:AdminPostsController, file:otwcode_otwarchive\app\controllers\admin_posts_controller.rb, step:null]
+[name:index, type:KnownIssuesController, file:otwcode_otwarchive\app\controllers\known_issues_controller.rb, step:null]
+[name:invitations, type:Object, file:null, step:When ]
+[name:invitations, type:Object, file:null, step:Given ]
+[name:new, type:AdminSessionsController, file:otwcode_otwarchive\app\controllers\admin_sessions_controller.rb, step:null]
+[name:new, type:WorksController, file:otwcode_otwarchive\app\controllers\api\v1\works_controller.rb, step:null]
+[name:new, type:WorksController, file:otwcode_otwarchive\app\controllers\works_controller.rb, step:null]
+[name:new, type:PasswordsController, file:otwcode_otwarchive\app\controllers\passwords_controller.rb, step:null]
+[name:new, type:UsersController, file:otwcode_otwarchive\app\controllers\users_controller.rb, step:null]
+[name:page, type:Object, file:null, step:Then ]
+[name:page, type:Object, file:null, step:Given ]
+[name:select, type:Object, file:null, step:When ]
+[name:show, type:UsersController, file:otwcode_otwarchive\app\controllers\users_controller.rb, step:null]
+[name:show, type:AdminPostsController, file:otwcode_otwarchive\app\controllers\admin_posts_controller.rb, step:null]
+[name:size, type:SearchResult, file:otwcode_otwarchive\app\models\search_result.rb, step:Then ]
+[name:summary, type:Feedback, file:otwcode_otwarchive\app\models\feedback.rb, step:null]
+[name:summary, type:Feedback, file:otwcode_otwarchive\factories\feedback.rb, step:null]
+[name:times, type:Object, file:null, step:Given ]
+[name:to_i, type:Object, file:null, step:Then ]
+[name:to_i, type:Object, file:null, step:Given ]
+[name:token, type:Object, file:null, step:When ]
+[name:url_for, type:Object, file:null, step:null]
+[name:with_scope, type:WebSteps, file:otwcode_otwarchive\features\step_definitions\web_steps.rb, step:When ]
+[name:with_scope, type:WebSteps, file:otwcode_otwarchive\features\step_definitions\web_steps.rb, step:Then ]
+[name:with_scope, type:WebSteps, file:otwcode_otwarchive\features\step_definitions\web_steps.rb, step:Given ]
+[name:within, type:Object, file:null, step:When ]
+[name:within, type:Object, file:null, step:Given ]
+
+Referenced pages: 33
+otwcode_otwarchive\app\views\admin\_admin_nav.html.erb
+otwcode_otwarchive\app\views\admin_posts\_admin_index.html.erb
+otwcode_otwarchive\app\views\admin_posts\_admin_post.html.erb
+otwcode_otwarchive\app\views\admin_posts\_admin_post_form.html.erb
+otwcode_otwarchive\app\views\admin_posts\_filters.html.erb
+otwcode_otwarchive\app\views\admin_posts\edit.html.erb
+otwcode_otwarchive\app\views\admin_posts\index.html.erb
+otwcode_otwarchive\app\views\admin_posts\show.html.erb
+otwcode_otwarchive\app\views\admin_sessions\new.html.erb
+otwcode_otwarchive\app\views\archive_faqs\_admin_index.html.erb
+otwcode_otwarchive\app\views\archive_faqs\_faq_index.html.erb
+otwcode_otwarchive\app\views\archive_faqs\index.html.erb
+otwcode_otwarchive\app\views\comments\_commentable.html.erb
+otwcode_otwarchive\app\views\feedbacks\new.html.erb
+otwcode_otwarchive\app\views\invite_requests\index.html.erb
+otwcode_otwarchive\app\views\known_issues\_admin_index.html.erb
+otwcode_otwarchive\app\views\known_issues\index.html.erb
+otwcode_otwarchive\app\views\passwords\new.html.erb
+otwcode_otwarchive\app\views\user_sessions\_greeting.html.erb
+otwcode_otwarchive\app\views\user_sessions\_login.html.erb
+otwcode_otwarchive\app\views\user_sessions\_passwd.html.erb
+otwcode_otwarchive\app\views\user_sessions\_passwd_small.html.erb
+otwcode_otwarchive\app\views\user_sessions\new.html.erb
+otwcode_otwarchive\app\views\users\_contents.html.erb
+otwcode_otwarchive\app\views\users\_header.html.erb
+otwcode_otwarchive\app\views\users\_legal.html.erb
+otwcode_otwarchive\app\views\users\_passwd.html.erb
+otwcode_otwarchive\app\views\users\new.html.erb
+otwcode_otwarchive\app\views\users\show.html.erb
+otwcode_otwarchive\app\views\works\_standard_form.html.erb
+otwcode_otwarchive\app\views\works\_work_form_tags.html.erb
+otwcode_otwarchive\app\views\works\new.html.erb
+otwcode_otwarchive\app\views\works\new_import.html.erb
+

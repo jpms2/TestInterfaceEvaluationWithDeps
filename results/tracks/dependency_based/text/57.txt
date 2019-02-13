@@ -1,0 +1,35 @@
+Feature: Edit a context
+In order to work on todos in a context
+As a Tracks user
+I want to manage todos in a context
+Background:
+Given the following user record
+| login    | password | is_admin |
+| testuser | secret   | false    |
+@javascript
+Scenario: I can change the name of the context and it should update the new todo form
+When I go to the context page for "@pc"
+And I edit the context name in place to be "OutAndAbout"
+Then the context field of the new todo form should contain "OutAndAbout"
+@javascript
+Scenario: I can change the name of the context and it should still allow me to add new actions
+When I go to the context page for "@pc"
+And I edit the context name in place to be "OutAndAbout"
+And I submit a new action with description "a new next action"
+Then I should see the todo "a new next action"
+Feature: Edit a project
+In order to reach a goal by doing several related todos
+As a Tracks user
+I want to manage these todos in a project
+Background:
+Given the following user record
+| login    | password | is_admin |
+| testuser | secret   | false    |
+@javascript
+Scenario: I can change the name of the project and it should still allow me to add new actions
+Given I have a project "bananas"
+When I go to the "bananas" project
+And I edit the project name to "cherries"
+And I edit the default context to "@pc"
+And I submit a new action with description "a new next action"
+Then I should see the todo "a new next action"

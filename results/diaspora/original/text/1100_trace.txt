@@ -1,0 +1,7 @@
+[path:\features\step_definitions\keyboard_navigation_steps.rb, methods:[0, 10, 14]]
+[path:\features\step_definitions\session_steps.rb, methods:[16]]
+[path:\features\step_definitions\user_steps.rb, methods:[101]]
+[path:\features\step_definitions\web_steps.rb, methods:[21]]
+[path:\features\support\paths.rb, methods:[[name:navigate_to, step:When ], [name:path_to, step:When ]]]
+[path:\features\support\publishing_cuke_helpers.rb, methods:[[name:stream_element_numbers_content, step:Then ]]]
+[path:\features\support\user_cuke_helpers.rb, methods:[[name:automatic_login, step:Given ], [name:confirm_login, step:Given ]]]

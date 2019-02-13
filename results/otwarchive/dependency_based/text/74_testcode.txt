@@ -1,0 +1,90 @@
+Given /^I am logged in as an admin$/ do
+  step("I am logged out")
+  admin = Admin.find_by_login("testadmin")
+  if admin.blank?
+    admin = FactoryGirl.create(:admin, login: "testadmin", password: "testadmin", email: "testadmin@example.org")
+  end
+  visit admin_login_path
+  fill_in "Admin user name", with: "testadmin"
+  fill_in "Admin password", with: "testadmin"
+  click_button "Log in as admin"
+  step("I should see \"Successfully logged in\"")
+end
+When /^I fill in "([^"]*)" with "([^"]*)'s" invite code$/  do |field, login|
+  user = User.find_by_login(login)
+  token = user.invitations.first.token
+  fill_in(field, with: token)
+end
+Given(/^all emails? (?:have|has) been delivered$/) do
+  ActionMailer::Base.deliveries.clear
+  ActionMailer::Base.deliveries.should be_empty # Sanity check, ftw
+end
+Given(/^(\d)+ emails? should be delivered$/) do |count|
+  emails.size.should == count.to_i
+end
+Then(/^#{capture_email} should have #{capture_fields}$/) do |email_ref, fields|
+  email(email_ref, fields).should_not be_nil
+end
+When /^(?:|I )press "([^"]*)"(?: within "([^"]*)")?$/ do |button, selector|
+  with_scope(selector) do
+    click_button(button)
+  end
+end
+When /^(?:|I )follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
+  with_scope(selector) do
+    click_link(link)
+  end
+end
+When /^(?:|I )fill in "([^"]*)" with "([^"]*)"(?: within "([^"]*)")?$/ do |field, value, selector|
+  with_scope(selector) do
+    fill_in(field, :with => value)
+  end
+end
+When /^(?:|I )select "([^"]*)" from "([^"]*)"(?: within "([^"]*)")?$/ do |value, field, selector|
+  with_scope(selector) do
+    select(value, :from => field)
+  end
+end
+Then /^(?:|I )should see "([^"]*)"(?: within "([^"]*)")?$/ do |text, selector|
+  with_scope(selector) do
+    page.should have_content(text)
+  end
+end
+  def with_scope(locator)
+    locator ? within(locator) { yield } : yield
+  end
+Given(/^#{capture_model} exists?(?: with #{capture_fields})?$/) do |name, fields|
+  create_model(name, fields)
+end
+Given /^"([^\"]*)" has "([^"]*)" invitations?$/ do |login, invitation_count|
+  user = User.find_by_login(login)
+  # If there are more invitations than we want, first destroy them
+  if invitation_count.to_i < user.invitations.count
+    user.invitations.destroy_all 
+  end
+  # Now create the number of invitations we want
+  invitation_count.to_i.times { user.invitations.create }
+end
+Given /^an invitation request for "([^"]*)"$/ do |email|
+  visit invite_requests_path
+  fill_in("invite_request[email]", with: email)
+  click_button("Add me to the list")
+end
+Given /^the user "([^\"]*)" exists and is activated$/ do |login|
+  user = User.find_by_login(login)
+  if user.blank?
+    user = FactoryGirl.create(:user, {:login => login, :password => "#{DEFAULT_PASSWORD}"})
+    user.activate
+  end
+end
+Given /^I am logged out$/ do
+  visit logout_path
+  assert !UserSession.find
+  visit admin_logout_path
+  assert !AdminSession.find
+end
+Then /^(?:|I )should see "([^"]*)"(?: within "([^"]*)")?$/ do |text, selector|
+  with_scope(selector) do
+    page.should have_content(text)
+  end
+end

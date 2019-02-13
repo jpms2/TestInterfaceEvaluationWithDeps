@@ -1,0 +1,33 @@
+Given /^an? (world location|international delegation) "([^"]*)" exists$/ do |world_location_type, name|
+  create(world_location_type.gsub(' ', '_').to_sym, name: name)
+end
+When /^I visit the world locations page$/ do
+  visit world_locations_path
+end
+Then /^I should see (#{THE_DOCUMENT})$/ do |edition|
+  assert has_css?(record_css_selector(edition))
+end
+Given /^I am (?:a|an) (writer|editor|admin|GDS editor|GDS admin|importer|managing editor)(?: called "([^"]*)")?$/ do |role, name|
+  @user = case role
+  when "writer"
+    create(:writer, name: (name || "Wally Writer"))
+  when "editor"
+    create(:departmental_editor, name: (name || "Eddie Depteditor"))
+  when "admin"
+    create(:user)
+  when "GDS editor"
+    create(:gds_editor)
+  when "GDS admin"
+    create(:gds_admin)
+  when 'importer'
+    create(:importer)
+  when 'managing editor'
+    create(:managing_editor)
+  end
+  login_as @user
+end
+  def login_as(user)
+    GDS::SSO.test_user = user
+    Edition::AuditTrail.whodunnit = user
+    super(user) # warden
+  end

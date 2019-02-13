@@ -1,0 +1,6 @@
+[path:\features\step_definitions\admin_steps.rb, methods:[40, 174]]
+[path:\features\step_definitions\email_steps.rb, methods:[12, 17, 45]]
+[path:\features\step_definitions\invite_steps.rb, methods:[77, 87]]
+[path:\features\step_definitions\pickle_steps.rb, methods:[3]]
+[path:\features\step_definitions\user_steps.rb, methods:[30, 112]]
+[path:\features\step_definitions\web_steps.rb, methods:[32, 38, 26, 106, 69, [name:with_scope, step:When ], [name:with_scope, step:Then ], [name:with_scope, step:Given ]]]

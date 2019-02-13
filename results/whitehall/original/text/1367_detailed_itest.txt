@@ -1,0 +1,35 @@
+Classes: 9
+[name:Document, file:alphagov_whitehall\app\models\document.rb, step:Given ]
+[name:Document, file:alphagov_whitehall\app\models\document.rb, step:When ]
+[name:Edition, file:alphagov_whitehall\app\models\edition.rb, step:Given ]
+[name:Edition, file:alphagov_whitehall\app\presenters\publishing_api_presenters\edition.rb, step:Given ]
+[name:GDS, file:null, step:Given ]
+[name:PublishingApiPresenters, file:alphagov_whitehall\app\presenters\publishing_api_presenters.rb, step:Given ]
+[name:SpecialistTagFinder, file:alphagov_whitehall\lib\specialist_tag_finder.rb, step:Given ]
+[name:THE_DOCUMENT, file:null, step:Then ]
+[name:User, file:alphagov_whitehall\app\models\user.rb, step:Given ]
+
+Methods: 18
+[name:base_path, type:ComingSoon, file:alphagov_whitehall\app\presenters\publishing_api_presenters\coming_soon.rb, step:Given ]
+[name:base_path, type:Edition, file:alphagov_whitehall\app\presenters\publishing_api_presenters\edition.rb, step:Given ]
+[name:base_path, type:HtmlAttachment, file:alphagov_whitehall\app\presenters\publishing_api_presenters\html_attachment.rb, step:Given ]
+[name:base_path, type:Item, file:alphagov_whitehall\app\presenters\publishing_api_presenters\item.rb, step:Given ]
+[name:base_path, type:TopicalEventAboutPage, file:alphagov_whitehall\app\presenters\publishing_api_presenters\topical_event_about_page.rb, step:Given ]
+[name:base_path, type:Unpublishing, file:alphagov_whitehall\app\presenters\publishing_api_presenters\unpublishing.rb, step:Given ]
+[name:content_store_has_item, type:Object, file:null, step:Given ]
+[name:create, type:Object, file:null, step:Given ]
+[name:create, type:SpeechType, file:alphagov_whitehall\app\models\speech_type.rb, step:Given ]
+[name:has_css?, type:Object, file:null, step:Then ]
+[name:index, type:PolicyGroupsController, file:alphagov_whitehall\app\controllers\admin\policy_groups_controller.rb, step:null]
+[name:index, type:PolicyGroupsController, file:alphagov_whitehall\app\controllers\policy_groups_controller.rb, step:null]
+[name:login_as, type:GdsSsoHelper, file:alphagov_whitehall\features\support\gds_sso_helper.rb, step:Given ]
+[name:merge!, type:Object, file:null, step:Given ]
+[name:presenter_for, type:PublishingApiPresenters, file:alphagov_whitehall\app\presenters\publishing_api_presenters.rb, step:Given ]
+[name:record_css_selector, type:Object, file:null, step:Then ]
+[name:unstub, type:SpecialistTagFinder, file:alphagov_whitehall\lib\specialist_tag_finder.rb, step:Given ]
+[name:unstub_tag_finder, type:SpecialistSectorHelper, file:alphagov_whitehall\features\support\specialist_sector_helper.rb, step:Given ]
+
+Referenced pages: 2
+alphagov_whitehall\app\views\policy_groups\index.html.erb
+alphagov_whitehall\app\views\shared\_heading.html.erb
+

@@ -1,0 +1,23 @@
+Classes: 4
+[name:Edition, file:alphagov_whitehall\app\models\edition.rb, step:Given ]
+[name:GDS, file:null, step:Given ]
+[name:THE_DOCUMENT, file:null, step:Then ]
+[name:User, file:alphagov_whitehall\app\models\user.rb, step:Given ]
+
+Methods: 11
+[name:create, type:Object, file:null, step:Given ]
+[name:create, type:SpeechType, file:alphagov_whitehall\app\models\speech_type.rb, step:Given ]
+[name:gsub, type:Object, file:null, step:Given ]
+[name:has_css?, type:Object, file:null, step:Then ]
+[name:index, type:WorldLocationsController, file:alphagov_whitehall\app\controllers\admin\world_locations_controller.rb, step:null]
+[name:index, type:WorldLocationsController, file:alphagov_whitehall\app\controllers\api\world_locations_controller.rb, step:null]
+[name:index, type:WorldLocationsController, file:alphagov_whitehall\app\controllers\world_locations_controller.rb, step:null]
+[name:login_as, type:GdsSsoHelper, file:alphagov_whitehall\features\support\gds_sso_helper.rb, step:Given ]
+[name:name, type:WorldLocation, file:alphagov_whitehall\app\models\world_location.rb, step:null]
+[name:record_css_selector, type:Object, file:null, step:Then ]
+[name:to_sym, type:Object, file:null, step:Given ]
+
+Referenced pages: 2
+alphagov_whitehall\app\views\world_locations\_world_location.html.erb
+alphagov_whitehall\app\views\world_locations\index.html.erb
+

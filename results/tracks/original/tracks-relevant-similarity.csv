@@ -1,0 +1,5 @@
+"Repository","https://github.com/TracksApp/tracks.git"
+"Correlation Jaccard Text-Real","null"
+"Correlation Cosine Text-Real","null"
+"Task_A","Task_B","Text","Test_Jaccard","Real_Jaccard","Test_Cosine","Real_Cosine"
+"57","124","0.6449875577080969","0.3157894737","0.0","0.6546536707079772","0.0"

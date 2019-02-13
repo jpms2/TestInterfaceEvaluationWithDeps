@@ -1,0 +1,35 @@
+Given /^I am in the '([^']+)' course page$/ do |course_title|
+  @course_title = course_title.parameterize
+  visit "/courses/#{@course_title}"
+end
+When /^I go to the '([^']+)' lesson page$/ do |lesson_title|
+  lesson_title = lesson_title.parameterize
+  visit "/courses/#{@course_title}/lessons/#{lesson_title}"
+end
+When /^I click on the Next Lesson link$/ do
+  within '.lnav-next.lnav-wrap' do
+    page.find('a').click
+  end
+end
+When /^I click on the Prev Lesson link$/ do
+  within '.lnav-prev.lnav-wrap' do
+    page.find('a').click
+  end
+end
+Then /^I should be in '([^']+)' lesson page$/ do |lesson_title|
+  lesson_title = lesson_title.parameterize
+  expect(page.current_path).to eql "/courses/#{@course_title}/lessons/#{lesson_title}"
+end
+Given /^a course named '([^']+)' exists$/ do |course_name|
+  @course = FactoryGirl.create(:course, title: course_name)
+end
+Given /^a section named '([^']+)' exists$/ do |section_name|
+  @section = FactoryGirl.create(:section, title: section_name, course: @course)
+end
+Given /^the following lessons exist in '([^']+)' section:$/ do |section_title, table|
+  section = Section.find_by(title: section_title)
+  @lessons = []
+  table.hashes.each do |hash|
+    @lessons << FactoryGirl.create(:lesson, title: hash[:lesson_name], section: section)
+  end
+end

@@ -1,0 +1,583 @@
+Given /^I set up importing( with a mock website)?$/ do |mock|
+  unless mock.blank?
+    mock_external
+  end
+  step %{basic tags}
+  step %{I am logged in as a random user}
+  step %{I go to the import page}
+end
+When /^I start importing "(.*)"( with a mock website)?$/ do |url, mock|
+  step %{I set up importing#{mock}}
+  step %{I fill in "urls" with "#{url}"}
+end
+def mock_external
+  WebMock.allow_net_connect!
+  WebMock.stub_request(:any, /import-site-with-tags/).
+    to_return(status: 200,
+              body:
+                "Title: #{content_fields[:title]}
+Summary:  #{content_fields[:summary]}
+Date: #{content_fields[:date]}
+Fandom:  #{content_fields[:fandoms]}
+Rating: #{content_fields[:rating]}
+Warnings:  #{content_fields[:warnings]}
+Characters:  #{content_fields[:characters]}
+Pairings:  #{content_fields[:relationships]}
+Category:  #{content_fields[:categories]}
+Tags:  #{content_fields[:freeform]}
+Author's notes:  #{content_fields[:notes]}
+
+stubbed response", headers: {})
+
+  WebMock.stub_request(:any, /import-site-without-tags/).
+    to_return(status: 200,
+              body: "stubbed response",
+              headers: {})
+
+  WebMock.stub_request(:any, /no-content/).
+    to_return(status: 200,
+              body: "",
+              headers: {})
+
+  WebMock.stub_request(:any, /bar/).
+    to_return(status: 404, headers: {})
+end
+def content_fields
+  {
+    title: "Detected Title", summary: "Detected summary", fandoms: "Detected Fandom", warnings: "Underage",
+    characters: "Detected 1, Detected 2", rating: "Explicit", relationships: "Detected 1/Detected 2",
+    categories: "F/F", freeform: "Detected tag 1, Detected tag 2", external_author_name: "Detected Author",
+    external_author_email: "detected@foo.com", notes: "This is a <i>content note</i>.",
+    date: "2002-01-12", chapter_title: "Detected chapter title"
+  }
+end
+When /^(?:|I )go to (.+)$/ do |page_name|
+  visit path_to(page_name)
+end
+When /^(?:|I )press "([^"]*)"(?: within "([^"]*)")?$/ do |button, selector|
+  with_scope(selector) do
+    click_button(button)
+  end
+end
+When /^(?:|I )follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
+  with_scope(selector) do
+    click_link(link)
+  end
+end
+When /^(?:|I )fill in "([^"]*)" with "([^"]*)"(?: within "([^"]*)")?$/ do |field, value, selector|
+  with_scope(selector) do
+    fill_in(field, :with => value)
+  end
+end
+When /^(?:|I )select "([^"]*)" from "([^"]*)"(?: within "([^"]*)")?$/ do |value, field, selector|
+  with_scope(selector) do
+    select(value, :from => field)
+  end
+end
+When /^(?:|I )check "([^"]*)"(?: within "([^"]*)")?$/ do |field, selector|
+  with_scope(selector) do
+    check(field)
+  end
+end
+When /^(?:|I )choose "([^"]*)"(?: within "([^"]*)")?$/ do |field, selector|
+  with_scope(selector) do
+    choose(field)
+  end
+end
+Then /^(?:|I )should see "([^"]*)"(?: within "([^"]*)")?$/ do |text, selector|
+  with_scope(selector) do
+    page.should have_content(text)
+  end
+end
+Then /^(?:|I )should not see "([^"]*)"(?: within "([^"]*)")?$/ do |text, selector|
+  with_scope(selector) do
+    if page.respond_to? :should
+      page.should have_no_content(text)
+    else
+      assert page.has_no_content?(text)
+    end
+  end
+end
+  def with_scope(locator)
+    locator ? within(locator) { yield } : yield
+  end
+  def path_to(page_name)
+    case page_name
+
+    when /the home\s?page/
+      '/'
+    when /^the search bookmarks page$/i
+      Bookmark.tire.index.refresh
+      search_bookmarks_path
+    when /^the search tags page$/i
+      Tag.tire.index.refresh
+      search_tags_path
+    when /^the search works page$/i
+      Work.tire.index.refresh
+      search_works_path      
+    when /^the search people page$/i
+      Pseud.tire.index.refresh
+      search_people_path
+    when /^the bookmarks page$/i
+      bookmarks_path
+
+    # the following are examples using path_to_pickle
+
+    when /^#{capture_model}(?:'s)? page$/                           # eg. the forum's page
+      path_to_pickle $1
+
+    when /^#{capture_model}(?:'s)? #{capture_model}(?:'s)? page$/   # eg. the forum's post's page
+      path_to_pickle $1, $2
+
+    when /^#{capture_model}(?:'s)? #{capture_model}'s (.+?) page$/  # eg. the forum's post's comments page
+      path_to_pickle $1, $2, :extra => $3                           #  or the forum's post's edit page
+
+    when /^#{capture_model}(?:'s)? (.+?) page$/                     # eg. the forum's posts page
+      path_to_pickle $1, :extra => $2                               #  or the forum's edit page
+
+    # Add more mappings here.
+
+    when /^the tagsets page$/i
+      tag_sets_path
+    when /^the login page$/i
+      new_user_session_path
+    when /^account creation page$/i
+      new_user_path
+    when /^invite requests page$/i
+      invite_requests_path
+    when /my pseuds page/
+      user_pseuds_path(User.current_user)
+    when /my user page/
+      user_path(User.current_user)
+    when /my preferences page/
+      user_preferences_path(User.current_user)
+    when /my bookmarks page/
+      Bookmark.tire.index.refresh
+      user_bookmarks_path(User.current_user)
+    when /my works page/
+      Work.tire.index.refresh
+      user_works_path(User.current_user)
+    when /my edit multiple works page/
+      show_multiple_user_works_path(User.current_user)
+    when /my subscriptions page/
+      user_subscriptions_path(User.current_user)   
+    when /my stats page/
+      user_stats_path(User.current_user)   
+    when /my profile page/
+      user_profile_path(User.current_user)
+    when /my claims page/
+      user_claims_path(User.current_user)
+    when /my signups page/
+      user_signups_path(User.current_user)
+    when /my related works page/
+      user_related_works_path(User.current_user)
+    when /my inbox page/
+      user_inbox_path(User.current_user)
+    when /my invitations page/
+      user_invitations_path(User.current_user)
+    when /my gifts page/
+      user_gifts_path(User.current_user)
+    when /my assignments page/
+      user_assignments_path(User.current_user)
+    when /^(.*)'s gifts page/
+      user_gifts_path(user_id: $1)
+    when /the import page/
+      new_work_path(:import => 'true')
+    when /the work-skins page/
+      skins_path(:skin_type => "WorkSkin")
+    when /^(.*?)(?:'s)? user page$/i
+      user_path(id: $1)
+    when /^(.*?)(?:'s)? user url$/i
+      user_url(id: $1).sub("http://www.example.com", "http://#{ArchiveConfig.APP_HOST}")
+    when /^(.*?)(?:'s)? works page$/i
+      Work.tire.index.refresh
+      user_works_path(user_id: $1)
+    when /^the "(.*)" work page/
+      work_path(Work.find_by_title($1))
+    when /^the work page with title (.*)/
+      work_path(Work.find_by_title($1))
+    when /^(.*?)(?:'s)? bookmarks page$/i
+      Bookmark.tire.index.refresh
+      user_bookmarks_path(user_id: $1)
+    when /^(.*?)(?:'s)? pseuds page$/i
+      user_pseuds_path(user_id: $1)
+    when /^(.*?)(?:'s)? invitations page$/i
+      user_invitations_path(user_id: $1)
+    when /^(.*?)(?:'s)? reading page$/i
+      user_readings_path(user_id: $1)
+    when /^(.*?)(?:'s)? series page$/i
+      user_series_index_path(user_id: $1)
+    when /^(.*?)(?:'s)? stats page$/i
+      user_stats_path(user_id: $1)
+    when /^(.*?)(?:'s)? preferences page$/i
+      user_preferences_path(user_id: $1)
+    when /^(.*?)(?:'s)? related works page$/i
+      user_related_works_path(user_id: $1)
+    when /^the subscriptions page for "(.*)"$/i
+      user_subscriptions_path(user_id: $1)
+    when /^(.*?)(?:'s)? profile page$/i
+      user_profile_path(user_id: $1)
+    when /^(.*)'s skins page/
+      skins_path(user_id: $1)
+    when /^"(.*)" skin page/
+      skin_path(Skin.find_by_title($1))
+    when /^the new wizard skin page/
+      new_skin_path(wizard: true)
+    when /^"(.*)" edit skin page/
+      edit_skin_path(Skin.find_by_title($1))
+    when /^"(.*)" edit wizard skin page/
+      edit_skin_path(Skin.find_by_title($1), wizard: true)
+    when /^"(.*)" collection's page$/i                         # e.g. when I go to "Collection name" collection's page
+      collection_path(Collection.find_by_title($1))
+    when /^the "(.*)" signups page$/i                          # e.g. when I go to the "Collection name" signup page
+      collection_signups_path(Collection.find_by_title($1))
+    when /^the "(.*)" requests page$/i                         # e.g. when I go to the "Collection name" signup page
+      collection_requests_path(Collection.find_by_title($1))
+    when /^the "(.*)" assignments page$/i                      # e.g. when I go to the "Collection name" assignments page
+      collection_assignments_path(Collection.find_by_title($1))
+    when /^"(.*)" collection's url$/i                          # e.g. when I go to "Collection name" collection's url
+      collection_url(Collection.find_by_title($1)).sub("http://www.example.com", "http://#{ArchiveConfig.APP_HOST}")
+    when /^"(.*)" gift exchange edit page$/i
+      edit_collection_gift_exchange_path(Collection.find_by_title($1))
+    when /^"(.*)" gift exchange matching page$/i
+      collection_potential_matches_path(Collection.find_by_title($1))
+    when /^the works tagged "(.*)"$/i
+      Work.tire.index.refresh
+      tag_works_path(Tag.find_by_name($1))
+    when /^the bookmarks tagged "(.*)"$/i
+      Bookmark.tire.index.refresh
+      tag_bookmarks_path(Tag.find_by_name($1))
+    when /^the url for works tagged "(.*)"$/i
+      Work.tire.index.refresh
+      tag_works_url(Tag.find_by_name($1)).sub("http://www.example.com", "http://#{ArchiveConfig.APP_HOST}")
+    when /^the bookmarks in collection "(.*)"$/i
+      Bookmark.tire.index.refresh
+      collection_bookmarks_path(Collection.find_by_title($1))
+    when /^the works tagged "(.*)" in collection "(.*)"$/i
+      Work.tire.index.refresh
+      collection_tag_works_path(Collection.find_by_title($2), Tag.find_by_name($1))
+    when /^the url for works tagged "(.*)" in collection "(.*)"$/i
+      Work.tire.index.refresh
+      collection_tag_works_url(Collection.find_by_title($2), Tag.find_by_name($1)).sub("http://www.example.com", "http://#{ArchiveConfig.APP_HOST}")
+    when /^the tag comments? page for "(.*)"$/i
+      tag_comments_path(Tag.find_by_name($1))
+    when /^the admin-posts page$/i
+      admin_posts_path
+    when /^the admin-settings page$/i
+      admin_settings_path      
+    when /^the admin-notices page$/i
+      notify_admin_users_path
+    when /^the admin-blacklist page$/i
+      admin_blacklisted_emails_path
+    when /^the FAQ reorder page$/i
+      manage_archive_faqs_path
+    when /^the Wrangling Guidelines reorder page$/i
+      manage_wrangling_guidelines_path
+    when /^the tos page$/i
+      tos_path
+    when /^the faq page$/i
+      archive_faqs_path
+    when /^the wrangling guidelines page$/i
+      wrangling_guidelines_path
+    when /^the support page$/i
+      new_feedback_report_path
+    when /^the new tag ?set page$/i
+      new_tag_set_path
+    when /^the "(.*)" tag ?set edit page$/i
+      edit_tag_set_path(OwnedTagSet.find_by_title($1))    
+    when /^the "(.*)" tag ?set page$/i
+      tag_set_path(OwnedTagSet.find_by_title($1))
+    when /^the manage users page$/
+      admin_users_path
+    when /^the abuse administration page for "(.*)"$/i
+      admin_user_path(User.find_by_login($1))
+    when /^the Open Doors tools page$/i
+      opendoors_tools_path
+    when /^the languages page$/i
+      languages_path
+    when /^the wranglers page$/i
+      tag_wranglers_path
+    when /^the unassigned fandoms page $/i
+      unassigned_fandoms_path
+      
+    # Here is an example that pulls values out of the Regexp:
+    #
+    #   when /^(.*)'s profile page$/i
+    #     user_profile_path(User.find_by_login($1))
+
+    else
+      begin
+        page_name =~ /the (.*) page/
+        path_components = $1.split(/\s+/)
+        self.send(path_components.push('path').join('_').to_sym)
+      rescue Object => e
+        raise "Can't find mapping from \"#{page_name}\" to a path.\n" +
+          "Now, go and add a mapping in #{__FILE__}"
+      end
+    end
+  end
+Given /^I am logged in as "([^\"]*)" with password "([^\"]*)"$/ do |login, password|
+  step("I am logged out")
+  user = User.find_by_login(login)
+  if user.blank?
+    user = FactoryGirl.create(:user, {:login => login, :password => password})
+    user.activate
+  else
+    user.password = password
+    user.password_confirmation = password
+    user.save
+  end
+  visit login_path
+  fill_in "User name", :with => login
+  fill_in "Password", :with => password
+  check "Remember Me"
+  click_button "Log In"
+  assert UserSession.find
+end
+Given /^I am logged in as "([^\"]*)"$/ do |login|
+  step(%{I am logged in as "#{login}" with password "#{DEFAULT_PASSWORD}"})
+end
+Given /^I am logged in as a random user$/ do
+  step("I am logged out")
+  name = "testuser#{User.count + 1}"
+  user = FactoryGirl.create(:user, :login => name, :password => DEFAULT_PASSWORD)
+  user.activate
+  visit login_path
+  fill_in "User name", :with => name
+  fill_in "Password", :with => DEFAULT_PASSWORD
+  check "Remember me"
+  click_button "Log In"
+  assert UserSession.find
+end
+When /^"([^\"]*)" creates the pseud "([^\"]*)"$/ do |username, newpseud|
+  visit new_user_pseud_path(username)
+  fill_in "Name", :with => newpseud
+  click_button "Create"
+end
+When /^I post (?:a|the) work "([^\"]*)"(?: with fandom "([^\"]*)")?(?: with freeform "([^\"]*)")?(?: with category "([^\"]*)")?(?: (?:in|to) (?:the )?collection "([^\"]*)")?(?: as a gift (?:for|to) "([^\"]*)")?$/ do |title, fandom, freeform, category, collection, recipient|  
+  # If the work is already a draft then visit the preview page and post it
+  work = Work.find_by_title(title)
+  if work
+    visit preview_work_url(work)
+    click_button("Post")
+  else
+    # Note: this will match the above regexp and work just fine even if all the options are blank!
+    step %{I set up the draft "#{title}" with fandom "#{fandom}" with freeform "#{freeform}" with category "#{category}" in collection "#{collection}" as a gift to "#{recipient}"}
+    click_button("Post Without Preview")
+  end
+  Work.tire.index.refresh
+end
+When /^I view the work "([^\"]*)"(?: in (full|chapter-by-chapter) mode)?$/ do |work, mode|
+  work = Work.find_by_title!(work)
+  visit work_url(work)
+  step %{I follow "Entire Work"} if mode == "full"
+  step %{I follow "Chapter by Chapter"} if mode == "chapter-by-chapter"
+end
+When /^I set the publication date to today$/ do
+  today = Time.new
+  month = today.strftime("%B")
+  
+  if page.has_selector?("#backdate-options-show")
+    check("backdate-options-show") if page.find("#backdate-options-show")
+    select("#{today.day}", :from => "work[chapter_attributes][published_at(3i)]")
+    select("#{month}", :from => "work[chapter_attributes][published_at(2i)]")
+    select("#{today.year}", :from => "work[chapter_attributes][published_at(1i)]")
+  else
+    select("#{today.day}", :from => "chapter[published_at(3i)]")
+    select("#{month}", :from => "chapter[published_at(2i)]")
+    select("#{today.year}", :from => "chapter[published_at(1i)]")
+  end
+end
+When /^I delete the work "([^\"]*)"$/ do |work|
+  work = Work.find_by_title!(work)
+  visit edit_work_url(work)
+  step %{I follow "Delete Work"}
+  click_button("Yes, Delete Work")
+  Work.tire.index.refresh
+end
+When /^I give the work to "([^\"]*)"$/ do |recipient|
+  fill_in("work_recipients", with: "#{recipient}")
+end
+When /^I view the "([^\"]*)" works index$/ do |tag|
+  visit works_path(:tag_id => tag.to_param)
+end
+Given /^basic tags$/ do
+  ratings = [ArchiveConfig.RATING_DEFAULT_TAG_NAME,
+             ArchiveConfig.RATING_GENERAL_TAG_NAME,
+             ArchiveConfig.RATING_TEEN_TAG_NAME,
+             ArchiveConfig.RATING_MATURE_TAG_NAME,
+             ArchiveConfig.RATING_EXPLICIT_TAG_NAME]
+  ratings.each do |rating|
+    Rating.find_or_create_by_name_and_canonical(rating, true)
+  end
+  Warning.find_or_create_by_name_and_canonical("No Archive Warnings Apply", true)
+  Warning.find_or_create_by_name_and_canonical("Choose Not To Use Archive Warnings", true)
+  Fandom.find_or_create_by_name_and_canonical("No Fandom", true)
+  Category.find_or_create_by_name_and_canonical("Gen", true)
+  Category.find_or_create_by_name_and_canonical("Other", true)
+  Category.find_or_create_by_name_and_canonical("F/F", true)
+  Category.find_or_create_by_name_and_canonical("Multi", true)
+  Category.find_or_create_by_name_and_canonical("F/M", true)
+  Category.find_or_create_by_name_and_canonical("M/M", true)
+end
+Given(/^#{capture_model} exists?(?: with #{capture_fields})?$/) do |name, fields|
+  create_model(name, fields)
+end
+Then /^I should not see the image "([^"]*)" text "([^"]*)"(?: within "([^"]*)")?$/ do |attribute, text, selector|
+  with_scope(selector) do
+    page.should_not have_xpath("//img[@#{attribute}='#{text}']")
+  end
+end
+When /^"([^\"]*)" is fixed$/ do |what|
+  puts "\nDEFERRED (#{what})"
+end
+Given /^(?:I have )?(?:a|an|the) (hidden)?(?: )?(anonymous)?(?: )?(moderated)?(?: )?(closed)?(?: )?collection "([^\"]*)"(?: with name "([^\"]*)")?$/ do |hidden, anon, moderated, closed, title, name|
+  step %{I am logged in as "moderator"}
+  step %{I set up the collection "#{title}" with name "#{name}"}
+  check("This collection is unrevealed") unless hidden.blank?
+  check("This collection is anonymous") unless anon.blank?
+  check("This collection is moderated") unless moderated.blank?
+  check("This collection is closed") unless closed.blank?
+  step %{I submit}
+  step %{I am logged out}
+end
+Given(/^all emails? (?:have|has) been delivered$/) do
+  ActionMailer::Base.deliveries.clear
+  ActionMailer::Base.deliveries.should be_empty # Sanity check, ftw
+end
+Then(/^(\d)+ emails? should be delivered to (.*)$/) do |count, to|
+  emails("to: \"#{email_for(to)}\"").size.should == count.to_i
+end
+Then(/^#{capture_email} should contain "(.*)"$/) do |email_ref, text|
+  if email(email_ref).multipart?
+    email(email_ref).text_part.body.should =~ /#{text}/
+    email(email_ref).html_part.body.should =~ /#{text}/
+  else
+    email(email_ref).body.should =~ /#{text}/
+  end
+end
+  def email_for(to)
+    case to
+  
+    # add your own name => email address mappings here
+  
+    when /^#{capture_model}$/
+      model($1).email
+
+    when /^"([^@]*)"$/
+      user = User.find_by_login($1)
+      user.email 
+
+    when /^"(.*)"$/
+      $1
+  
+    else
+      to
+    end
+  end
+When /^I add the pseud "([^\"]*)"/ do |pseud| 
+  visit new_user_pseud_path(User.current_user)
+  fill_in("Name", with: pseud)
+  click_button("Create")
+end
+Given /^I am logged in as "([^\"]*)" with password "([^\"]*)"$/ do |login, password|
+  step("I am logged out")
+  user = User.find_by_login(login)
+  if user.blank?
+    user = FactoryGirl.create(:user, {:login => login, :password => password})
+    user.activate
+  else
+    user.password = password
+    user.password_confirmation = password
+    user.save
+  end
+  visit login_path
+  fill_in "User name", :with => login
+  fill_in "Password", :with => password
+  check "Remember Me"
+  click_button "Log In"
+  assert UserSession.find
+end
+Given /^I am logged in as "([^\"]*)"$/ do |login|
+  step(%{I am logged in as "#{login}" with password "#{DEFAULT_PASSWORD}"})
+end
+Given /^I am logged out$/ do
+  visit logout_path
+  assert !UserSession.find
+  visit admin_logout_path
+  assert !AdminSession.find
+end
+When /^(?:|I )follow "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|
+  with_scope(selector) do
+    click_link(link)
+  end
+end
+When /^(?:|I )fill in "([^"]*)" with "([^"]*)"(?: within "([^"]*)")?$/ do |field, value, selector|
+  with_scope(selector) do
+    fill_in(field, :with => value)
+  end
+end
+Given /^I set up importing( with a mock website)?$/ do |mock|
+  unless mock.blank?
+    mock_external
+  end
+  step %{basic tags}
+  step %{I am logged in as a random user}
+  step %{I go to the import page}
+end
+When /^I set up (?:a|the) draft "([^\"]*)"(?: with fandom "([^\"]*)")?(?: with freeform "([^\"]*)")?(?: with category "([^\"]*)")?(?: (?:in|to|with) (?:the )?collection "([^\"]*)")?(?: as a gift (?:for|to) "([^\"]*)")?$/ do |title, fandom, freeform, category, collection, recipient|
+  step %{basic tags}
+  visit new_work_path
+  step %{I fill in the basic work information for "#{title}"}
+  check(category.blank? ? DEFAULT_CATEGORY : category)
+  fill_in("Fandoms", with: (fandom.blank? ? DEFAULT_FANDOM : fandom))
+  fill_in("Additional Tags", with: (freeform.blank? ? DEFAULT_FREEFORM : freeform))
+  unless collection.blank?
+    c = Collection.find_by_title(collection)
+    fill_in("Collections", with: c.name)
+  end
+  fill_in("work_recipients", with: "#{recipient}") unless recipient.blank?
+end
+When /^I set up (?:a|the) collection "([^"]*)"(?: with name "([^"]*)")?$/ do |title, name|
+  visit new_collection_url
+  fill_in("collection_name", with: (name.blank? ? title.gsub(/[^\w]/, '_') : name))
+  fill_in("collection_title", with: title)
+end
+When /^I submit$/ do
+  step %{I submit with the 1st button}
+end
+Given /^I am logged in as a random user$/ do
+  step("I am logged out")
+  name = "testuser#{User.count + 1}"
+  user = FactoryGirl.create(:user, :login => name, :password => DEFAULT_PASSWORD)
+  user.activate
+  visit login_path
+  fill_in "User name", :with => name
+  fill_in "Password", :with => DEFAULT_PASSWORD
+  check "Remember me"
+  click_button "Log In"
+  assert UserSession.find
+end
+When /^(?:|I )go to (.+)$/ do |page_name|
+  visit path_to(page_name)
+end
+When /^I fill in the basic work information for "([^\"]*)"$/ do |title|
+  step %{I fill in basic work tags}
+  check(DEFAULT_WARNING)
+  fill_in("Work Title", with: title)
+  fill_in("content", with: DEFAULT_CONTENT)
+end
+When /^I submit with the (\d+)(?:st|nd|rd|th) button$/ do |index|
+  page.all("p.submit input[type='submit']")[(index.to_i-1)].click
+end
+Given /^I am logged out$/ do
+  visit logout_path
+  assert !UserSession.find
+  visit admin_logout_path
+  assert !AdminSession.find
+end
+When /^I fill in basic work tags$/ do
+  select(DEFAULT_RATING, :from => "Rating")
+  fill_in("Fandoms", :with => DEFAULT_FANDOM)
+  fill_in("Additional Tags", :with => DEFAULT_FREEFORM)
+end

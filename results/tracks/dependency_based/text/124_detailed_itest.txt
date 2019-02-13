@@ -1,0 +1,43 @@
+Classes: 4
+[name:FactoryGirl, file:null, step:Given ]
+[name:Project, file:TracksApp_tracks\app\models\project.rb, step:Given ]
+[name:User, file:TracksApp_tracks\app\models\user.rb, step:Given ]
+[name:UserTime, file:TracksApp_tracks\lib\user_time.rb, step:Given ]
+
+Methods: 31
+[name:be_nil, type:Object, file:null, step:Given ]
+[name:body, type:Object, file:null, step:Then ]
+[name:contexts, type:Object, file:null, step:Given ]
+[name:create!, type:Object, file:null, step:Given ]
+[name:create_preference, type:Object, file:null, step:Given ]
+[name:day, type:Object, file:null, step:Given ]
+[name:delete_all, type:User, file:TracksApp_tracks\app\models\user.rb, step:Given ]
+[name:each, type:Object, file:null, step:Given ]
+[name:first, type:Object, file:null, step:Given ]
+[name:first_or_create, type:Object, file:null, step:Given ]
+[name:hashes, type:Object, file:null, step:Given ]
+[name:have_content, type:Object, file:null, step:Then ]
+[name:id, type:Context, file:TracksApp_tracks\app\models\context.rb, step:Given ]
+[name:id, type:Project, file:TracksApp_tracks\app\models\project.rb, step:Given ]
+[name:id, type:User, file:TracksApp_tracks\app\models\user.rb, step:Given ]
+[name:index, type:Object, file:null, step:Then ]
+[name:list_deferred, type:TodosController, file:TracksApp_tracks\app\controllers\todos_controller.rb, step:null]
+[name:new, type:UserTime, file:TracksApp_tracks\lib\user_time.rb, step:Given ]
+[name:page, type:Object, file:null, step:Then ]
+[name:projects, type:Totals, file:TracksApp_tracks\app\models\stats\totals.rb, step:Given ]
+[name:projects, type:UserStats, file:TracksApp_tracks\app\models\stats\user_stats.rb, step:Given ]
+[name:projects, type:Calendar, file:TracksApp_tracks\app\models\todos\calendar.rb, step:Given ]
+[name:request_signin_as, type:TracksLoginHelper, file:TracksApp_tracks\features\support\tracks_login_helper.rb, step:Given ]
+[name:save!, type:Object, file:null, step:Given ]
+[name:time, type:UserTime, file:TracksApp_tracks\lib\user_time.rb, step:Given ]
+[name:to, type:Object, file:null, step:Then ]
+[name:to_i, type:Object, file:null, step:Given ]
+[name:to_not, type:Object, file:null, step:Given ]
+[name:todos, type:Object, file:null, step:Given ]
+[name:where, type:Object, file:null, step:Given ]
+[name:where, type:User, file:TracksApp_tracks\app\models\user.rb, step:Given ]
+
+Referenced pages: 2
+TracksApp_tracks\app\views\shared\_add_new_item_form.html.erb
+TracksApp_tracks\app\views\todos\list_deferred.html.erb
+

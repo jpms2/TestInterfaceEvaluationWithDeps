@@ -1,0 +1,7 @@
+"Repository","https://github.com/TheOdinProject/theodinproject.git"
+"TASK","HASH","RUBY","RAILS","COVERAGE","TESTS"
+"332","92f9157eb4b30665d43615235785a036f731ce80","2.3.0","4.2.5.2","simplecov","features\users\confirmation.feature(14);features\users\confirmation.feature(19);features\users\reset_password.feature(17);features\users\reset_password.feature(26);features\users\sign_in.feature(8);features\users\sign_in.feature(15);features\users\sign_out.feature(8)"
+"337","595db542f151d5e755d666733713c8d707a82dcd","2.3.0","4.2.5.2","simplecov","features\users\sign_in.feature(8);features\users\sign_in.feature(15);features\users\sign_out.feature(8);features\users\confirmation.feature(14);features\users\confirmation.feature(19);features\users\reset_password.feature(17);features\users\reset_password.feature(26)"
+"339","dc70ff24c2ca3183a8ec74d84b41891675cdfa04","2.3.0","4.2.5.2","simplecov","features\users\confirmation.feature(19);features\users\reset_password.feature(17);features\users\reset_password.feature(26)"
+"346","6c114edb7ef805e53a4eb4fadab0310186b79c7c","2.3.0","4.2.5.2","simplecov","features\users\sign_out.feature(8)"
+"388","b658079f5182c5755375228a3423d01bfc137b5d","2.3.0","4.2.5.2","simplecov","features\lesson_navigation.feature(16);features\lesson_navigation.feature(23)"

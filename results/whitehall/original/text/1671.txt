@@ -1,0 +1,39 @@
+Feature: governments
+As an editor
+I want to be able to associate content with a specific government
+So that we can appropriately identify less relevant content after elections.
+Scenario: creating a government
+Given I am a GDS admin
+When I create a government called "2005 to 2010 Labour government" starting on "06/05/2005"
+Then there should be a government called "2005 to 2010 Labour government" starting on "6 May 2005"
+Scenario: editing a government's start and end dates
+Given a government exists called "2005 to 2010 Labour government" between dates "06/05/2004" and "11/05/2009"
+And I am a GDS admin
+When I edit the government called "2005 to 2010 Labour government" to have dates "06/05/2005" and "11/05/2010"
+Then there should be a government called "2005 to 2010 Labour government" between dates "6 May 2005" and "11 May 2010"
+Feature: Administering Organisations
+Background:
+Given I am an admin in the organisation "Ministry of Pop"
+And a world location "United Kingdom" exists
+Scenario: Featuring policies on an organisation
+Given I am an editor in the organisation "Department of Fun"
+And and the policies "Dance around" and "Sing aloud" exist
+When I feature the policies "Dance around" and "Sing aloud" for "Department of Fun"
+Then I should see the featured policies in the "Department of Fun" organisation are:
+|Dance around|
+|Sing aloud|
+When I stop featuring the polices "Dance around" for "Department of Fun"
+Then I should see the featured policies in the "Department of Fun" organisation are:
+|Sing aloud|
+When I stop featuring the polices "Sing aloud" for "Department of Fun"
+Then there should be no featured policies on the home page of "Department of Fun"
+Scenario: Setting the order of policies featured on an organisation
+Given I am an editor in the organisation "Department of Fun"
+And and the policies "Dance around" and "Sing aloud" exist
+When I feature the policies "Dance around" and "Sing aloud" for "Department of Fun"
+And I order the featured policies in the "Department of Fun" organisation as:
+|Sing aloud|
+|Dance around|
+Then I should see the featured policies in the "Department of Fun" organisation are:
+|Sing aloud|
+|Dance around|

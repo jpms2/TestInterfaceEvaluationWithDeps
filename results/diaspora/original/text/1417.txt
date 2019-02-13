@@ -1,0 +1,518 @@
+Feature: search for users and hashtags
+In order to find my friends on diaspora
+As a user
+I want search for them
+Background:
+Given following users exist:
+| username       | email             |
+| Bob Jones      | bob@bob.bob       |
+| Alice Smith    | alice@alice.alice |
+| Carol Williams | carol@example.com |
+Scenario: search for a user and go to its profile
+When I sign in as "bob@bob.bob"
+And I enter "Alice Sm" in the search input
+Then I should see "Alice Smith" within ".tt-menu"
+When I click on the first search result
+Then I should see "Alice Smith" within ".profile_header #name"
+Scenario: search for a inexistent user and go to the search page
+When I sign in as "bob@bob.bob"
+And I enter "Trinity" in the search input
+And I press enter in the search input
+Then I should see "Users matching Trinity" within "#search_title"
+Scenario: search for a not searchable user
+When I sign in as "carol@example.com"
+And I go to the edit profile page
+And I mark myself as not searchable
+And I submit the form
+Then I should be on the edit profile page
+And the "profile[searchable]" checkbox should not be checked
+When I sign out
+And I sign in as "bob@bob.bob"
+And I enter "Carol Wi" in the search input
+Then I should not see any search results
+Given a user with email "bob@bob.bob" is connected with "carol@example.com"
+When I go to the home page
+And I enter "Carol Wi" in the search input
+Then I should see "Carol Williams" within ".tt-menu"
+When I click on the first search result
+Then I should see "Carol Williams" within ".profile_header #name"
+Scenario: search for a tag
+When I sign in as "bob@bob.bob"
+And I enter "#Matrix" in the search input
+Then I should see "#Matrix" within ".tt-menu"
+When I click on the first search result
+Then I should be on the tag page for "matrix"
+Feature: private conversations
+In order to be talkative
+As a User
+I want to converse with people
+Background:
+Given a user named "Robert Grimm" with email "bob@bob.bob"
+And a user named "Alice Awesome" with email "alice@alice.alice"
+And a user with username "robert_grimm" is connected with "alice_awesome"
+Scenario: open the conversations page without any contacts
+Given a user with email "eve@eve.eve"
+When I sign in as "eve@eve.eve"
+And I am on the conversations page
+Then I should see "You need to add some contacts before you can start a conversation"
+Scenario: send a message
+When I sign in as "bob@bob.bob"
+And I send a message with subject "Greetings" and text "hello, alice!" to "Alice Awesome"
+Then I should see "Greetings" within "#conversation_inbox"
+And I should see "Greetings" within "#conversation_show"
+And I should see "less than a minute ago" within "#conversation_inbox"
+And I should see "less than a minute ago" within "#conversation_show"
+And I should see "Alice Awesome" as a participant
+And "Alice Awesome" should be part of active conversation
+And I should see "hello, alice!" within ".stream_container"
+When I sign in as "alice@alice.alice"
+Then I should have 1 unread private message
+And I should have 1 email delivery
+When I reply with "hey, how you doing?"
+Then I should see "hey, how you doing?" within ".stream_container"
+Scenario: send a message using keyboard shortcuts
+When I sign in as "bob@bob.bob"
+And I send a message with subject "Greetings" and text "hello, alice!" to "Alice Awesome" using keyboard shortcuts
+Then I should see "Greetings" within "#conversation_inbox"
+And I should see "Greetings" within "#conversation_show"
+And "Alice Awesome" should be part of active conversation
+And I should see "hello, alice!" within ".stream_container"
+When I reply with "hey, how you doing?" using keyboard shortcuts
+Then I should see "hey, how you doing?" within ".stream_container"
+When I sign in as "alice@alice.alice"
+Then I should have 2 unread private messages
+And I should have 2 email delivery
+Feature: Viewing my activity on the steam mobile page
+In order to navigate Diaspora*
+As a mobile user
+I want to view my activity stream
+Background:
+Given a user with username "alice"
+And "alice@alice.alice" has a public post with text "Hello! I am #newhere"
+And I sign in as "alice@alice.alice" on the mobile website
+Scenario: Show post on my activity
+When I click on selector "a.like-action.inactive"
+And I open the drawer
+And I follow "My activity"
+Then I should see "My activity"
+And I should see "Hello! I am #newhere" within ".ltr"
+Feature: Navigate between pages using the header menu and the drawer
+As a user
+I want to be able navigate between the pages of the mobile version
+Background:
+Given following users exist:
+| username     | email             |
+| Bob Jones    | bob@bob.bob       |
+| Alice Smith  | alice@alice.alice |
+Scenario: navigate to my mentions page
+Given Alice has a post mentioning Bob
+And I sign in as "bob@bob.bob"
+When I open the drawer
+And I follow "@Mentions"
+Then I should see "Bob Jones" within ".stream_element"
+Scenario: navigate to the followed tags page
+Given "bob@bob.bob" has a public post with text "bob is da #boss"
+When I open the drawer
+And I search for "#boss"
+And I click on selector ".tag_following_action"
+And I click on selector "#compose_badge"
+And I open the drawer
+And I follow "#Followed tags"
+Then I should see "#boss" within "#followed_tags + li > ul"
+And I follow "#boss"
+Then I should see "bob is da #boss" within "#main_stream"
+When I open the drawer
+And I follow "#Followed tags"
+Then I should see "Manage followed tags" within "#followed_tags + li > ul"
+And I follow "Manage followed tags"
+Then I should see "#boss" within "ul.followed_tags"
+Scenario: navigate to my mentions page
+When I open the drawer
+And I follow "Contacts"
+Then I should see "Contacts" within "#main"
+Scenario: navigate to my mentions page
+When I open the drawer
+And I follow "Settings"
+Then I should see "Settings" within "#main"
+Feature: Not safe for work
+Background:
+Given a nsfw user with email "tommy@nsfw.example.com"
+And a user with email "laura@office.example.com"
+And a user with email "laura@office.example.com" is connected with "tommy@nsfw.example.com"
+Scenario: Setting not safe for work
+When I sign in as "tommy@nsfw.example.com"
+And I go to the edit profile page
+And I mark myself as not safe for work
+And I submit the form
+Then I should be on the edit profile page
+And the "profile[nsfw]" checkbox should be checked
+When I go to the edit profile page
+And I mark myself as safe for work
+And I submit the form
+Then I should be on the edit profile page
+And the "profile[nsfw]" checkbox should not be checked
+Scenario: Toggling nsfw state
+Given "tommy@nsfw.example.com" has a public post with text "I love 0bj3ction4bl3 c0nt3nt!" and a poll
+And "tommy@nsfw.example.com" has a public post with text "I love 0bj3ction4bl3 c0nt3nt!" and a location
+And "tommy@nsfw.example.com" has a public post with text "I love 0bj3ction4bl3 c0nt3nt!" and a picture
+When I sign in as "laura@office.example.com"
+Then I should not see "I love 0bj3ction4bl3 c0nt3nt!"
+And I should not see "What do you think about 1 ninjas?"
+And I should not see "Posted from:"
+And I should not see any picture in my stream
+When I toggle all nsfw posts
+Then I should see "I love 0bj3ction4bl3 c0nt3nt!"
+And I should see "What do you think about 1 ninjas?"
+And I should see "Posted from:"
+And I should see 1 pictures in my stream
+Scenario: Resharing a nsfw post with a poll
+Given "tommy@nsfw.example.com" has a public post with text "Sexy Senators Gone Wild!" and a poll
+When I sign in as "laura@office.example.com"
+And I toggle all nsfw posts
+And I follow "Reshare"
+And I confirm the alert
+Then I should see a "a.reshare-action.active"
+When I go to the home page
+Then I should not see "Sexy Senators Gone Wild!"
+And I should not see "What do you think about 1 ninjas?"
+And I should have 2 nsfw posts
+Scenario: Resharing a nsfw post with a location
+Given "tommy@nsfw.example.com" has a public post with text "Sexy Senators Gone Wild!" and a location
+When I sign in as "laura@office.example.com"
+And I toggle all nsfw posts
+And I follow "Reshare"
+And I confirm the alert
+Then I should see a "a.reshare-action.active"
+When I go to the home page
+Then I should not see "Sexy Senators Gone Wild!"
+And I should not see "Posted from:"
+And I should have 2 nsfw posts
+Scenario: Resharing a nsfw post with a picture
+Given "tommy@nsfw.example.com" has a public post with text "Sexy Senators Gone Wild!" and a picture
+When I sign in as "laura@office.example.com"
+And I toggle all nsfw posts
+And I follow "Reshare"
+And I confirm the alert
+Then I should see a "a.reshare-action.active"
+When I go to the home page
+Then I should not see "Sexy Senators Gone Wild!"
+And I should not see any picture in my stream
+And I should have 2 nsfw posts
+Feature: reactions mobile post
+In order to navigate Diaspora*
+As a mobile user
+I want to react to posts
+Background:
+Given following users exist:
+| username    | email             |
+| Bob Jones   | bob@bob.bob       |
+| Alice Smith | alice@alice.alice |
+Scenario: like on a mobile post
+When I should see "No reactions" within ".show_comments"
+And I click on selector "span.show_comments"
+And I click on selector "a.like-action.inactive"
+Then I should see a "a.like-action.active"
+When I go to the stream page
+And I should see "1 reaction" within ".show_comments"
+And I click on selector "a.show_comments"
+Then I should see "1" within ".like_count"
+Scenario: comment and delete a mobile post
+When I click on selector "a.comment-action.inactive"
+And I fill in the following:
+| text            | is that a poodle?    |
+And I press "Comment"
+Then I should see "is that a poodle?"
+When I go to the stream page
+And I should see "1 reaction" within ".show_comments"
+And I click on selector "a.show_comments"
+And I should see "1" within ".comment_count"
+When I click on selector "a.comment-action"
+And I click on selector "a.remove"
+And I confirm the alert
+Then I should not see "1 reaction" within ".show_comments"
+Feature: resharing from the mobile
+In order to make Diaspora more viral
+As a mobile user
+I want to reshare my friend's post
+Background:
+Given following users exist:
+| username    | email             |
+| Bob Jones   | bob@bob.bob       |
+| Alice Smith | alice@alice.alice |
+| Eve Doe     | eve@eve.eve       |
+Scenario: Resharing a post from a single post page
+And I click on selector "a.reshare-action.inactive"
+And I confirm the alert
+Then I should see a "a.reshare-action.active"
+When I go to the stream page
+Then I should see "Reshared via" within ".reshare_via"
+Scenario: Resharing a post from a single post page that is reshared
+Given the post with text "reshare this!" is reshared by "eve@eve.eve"
+And a user with email "alice@alice.alice" is connected with "eve@eve.eve"
+And I click on the first selector "a.reshare-action.inactive"
+And I confirm the alert
+Then I should see a "a.reshare-action.active"
+When I go to the stream page
+Then I should see "Reshared via" within ".reshare_via"
+Feature: invitation acceptance
+Scenario: accept invitation from user
+Given I have been invited by bob
+And I am on my acceptance form page
+And I fill in the new user form
+And I press "Sign up"
+Then I should be on the getting started page
+And I should see "Well, hello there!"
+And I fill in the following:
+| profile_first_name         | O             |
+And I follow "awesome_button"
+And I confirm the alert
+Then I should be on the stream page
+And I close the publisher
+And I log out
+And I sign in as "bob@bob.bob"
+And I click on selector "#invitations-button"
+Then I should see one less invite
+Scenario: sends an invitation
+Given a user with email "bob@bob.bob"
+When I sign in as "bob@bob.bob"
+And I click on selector "#invitations-button"
+And I fill in the following:
+| email_inviter_emails         | alex@example.com    |
+And I press "Send an invitation"
+Then I should have 1 Devise email delivery
+And I should not see "change your notification settings" in the last sent email
+Feature: The activity stream
+Background:
+Given following users exist:
+| username    | email             |
+| Bob Jones   | bob@bob.bob       |
+| Alice Smith | alice@alice.alice |
+Scenario: Sorting
+When I sign in as "bob@bob.bob"
+Given I expand the publisher
+When I write the status message "A- I like turtles"
+And I submit the publisher
+Given I expand the publisher
+When I write the status message "B- barack obama is your new bicycle"
+And I submit the publisher
+Given I expand the publisher
+When I write the status message "C- barack obama is a square"
+And I submit the publisher
+When I go to the activity stream page
+Then "C- barack obama is a square" should be post 1
+And "B- barack obama is your new bicycle" should be post 2
+And "A- I like turtles" should be post 3
+When I like the post "A- I like turtles" in the stream
+And I comment "Sassy sawfish" on "C- barack obama is a square"
+And I like the post "B- barack obama is your new bicycle" in the stream
+When I go to the activity stream page
+Then "B- barack obama is your new bicycle" should be post 1
+And "C- barack obama is a square" should be post 2
+And "A- I like turtles" should be post 3
+Scenario: delete a comment
+When I sign in as "bob@bob.bob"
+And I am on "alice@alice.alice"'s page
+Then I should see "Look at this dog"
+When I focus the comment field
+And I fill in the following:
+| text            | is that a poodle?    |
+And I press "Comment"
+When I go to the activity stream page
+Then I should see "Look at this dog"
+And I should see "is that a poodle?"
+When I am on "alice@alice.alice"'s page
+And I click to delete the first comment
+And I confirm the alert
+And I go to the activity stream page
+Then I should not see "Look at this dog"
+Scenario: unliking a post
+When I sign in as "bob@bob.bob"
+And I am on "alice@alice.alice"'s page
+Then I should see "Look at this dog"
+When I like the post "Look at this dog" in the stream
+And I go to the activity stream page
+Then I should see "Look at this dog"
+When I am on "alice@alice.alice"'s page
+And I unlike the post "Look at this dog" in the stream
+And I go to the activity stream page
+Then I should not see "Look at this dog"
+Scenario: multiple participations
+When I sign in as "bob@bob.bob"
+And I am on "alice@alice.alice"'s page
+Then I should see "Look at this dog"
+When I like the post "Look at this dog" in the stream
+And I go to the activity stream page
+Then I should see "Look at this dog"
+When I am on "alice@alice.alice"'s page
+Then I should see "Look at this dog"
+When I focus the comment field
+And I fill in the following:
+| text            | is that a poodle?    |
+And I press "Comment"
+And I go to the activity stream page
+Then I should see "Look at this dog"
+When I am on "alice@alice.alice"'s page
+And I unlike the post "Look at this dog" in the stream
+And I go to the activity stream page
+Then I should see "Look at this dog"
+When I am on "alice@alice.alice"'s page
+And I click to delete the first comment
+And I confirm the alert
+And I go to the activity stream page
+Then I should not see "Look at this dog"
+Feature: Close account
+In order to close an existing account
+As a user
+I want to sign in, close my account and try to log in again
+Scenario: user closes account
+Given I am signed in
+When I go to the users edit page
+And I click on selector "#close_account"
+Then I should see a modal
+And I should see "Hey, please don’t go!" within "#closeAccountModal"
+When I put in my password in "close_account_password"
+And I press "close_account_confirm"
+And I confirm the alert
+Then I should be on the new user session page
+When I try to sign in manually
+Then I should be on the new user session page
+And I should see a flash message with a warning
+Feature: following and being followed
+Background:
+Given following users exist:
+| email             |
+| bob@bob.bob       |
+| alice@alice.alice |
+Scenario: adding someone who follows you while creating a new aspect
+When I sign in as "alice@alice.alice"
+And I am on "bob@bob.bob"'s page
+And I press the first ".aspect_membership_dropdown .dropdown-toggle"
+And I press the first "a" within ".add_aspect"
+And I fill in "aspect_name" with "Super People" in the aspect creation modal
+And I click on selector ".btn-primary" in the aspect creation modal
+When I go to the home page
+Then I should have 1 contact in "Super People"
+Then I sign out
+When I sign in as "bob@bob.bob"
+Then I should have 1 contact in "Besties"
+Feature: editing your profile
+Scenario: editing profile fields
+Given I am signed in
+And I go to the edit profile page
+When I fill in the following:
+| profile_gender             | Fearless        |
+| profile_first_name         | Boba            |
+| profile_last_name          | Fett            |
+| profile_bio                | This is a bio   |
+| profile_location           | Kamino          |
+And I select "1986" from "profile_date_year"
+And I select "30" from "profile_date_day"
+And I select "November" from "profile_date_month"
+And I fill in "profile[tag_string]" with "#starwars"
+And I press the first ".as-result-item" within ".as-results"
+And I press "update_profile"
+Then I should be on my edit profile page
+And I should see a flash message indicating success
+And the "profile_gender" field should contain "Fearless"
+And the "profile_first_name" field should contain "Boba"
+And the "profile_last_name" field should contain "Fett"
+And I should see "This is a bio"
+And the "profile_date_year" field should be filled with "1986"
+And the "profile_date_month" field should be filled with "11"
+And the "profile_date_day" field should be filled with "30"
+And the "profile_location" field should be filled with "Kamino"
+And I should see "#starwars" within "ul#as-selections-tags"
+And the "#profile_public_details" bootstrap-switch should be off
+When I fill in "profile[tag_string]" with "#kamino"
+And I press the first ".as-result-item" within ".as-results"
+And I toggle the "#profile_public_details" bootstrap-switch
+And I press "update_profile"
+Then I should see "#kamino" within "ul#as-selections-tags"
+And I should see "#starwars" within "ul#as-selections-tags"
+And the "#profile_public_details" bootstrap-switch should be on
+When I attach the file "spec/fixtures/bad_urls.txt" to "file" within "#file-upload"
+And I confirm the alert
+And I attach the file "spec/fixtures/button.png" to hidden "file" within "#file-upload"
+Then I should see a "img" within "#profile_photo_upload"
+Feature: User manages contacts
+In order to share with a limited group
+As a User
+I want to create new aspects
+Scenario: creating an aspect from contacts index
+Given I am signed in
+And I am on the contacts page
+And I follow "+ Add an aspect"
+And I fill in "aspect_name" with "Dorm Mates" in the aspect creation modal
+And I click on selector ".btn-primary" in the aspect creation modal
+Then I should see "Dorm Mates" within "#aspect_nav"
+Scenario: creating an aspect from homepage
+Given I am signed in
+And I go to the aspects page
+When I follow "Add an aspect"
+And I fill in "aspect_name" with "losers" in the aspect creation modal
+And I click on selector ".btn-primary" in the aspect creation modal
+Then I should see "losers" within "#aspect_nav"
+Scenario: clicking on the contacts link in the header with zero contacts directs a user to the featured users page
+Given I am signed in
+And I have 0 contacts
+And I click on my name in the header
+When I follow "Contacts"
+Then I should see "Community spotlight" within ".col-md-9"
+Scenario: clicking on the contacts link in the header with contacts does not send a user to the featured users page
+Given I am signed in
+And I have 2 contacts
+And I click on my name in the header
+When I follow "Contacts"
+Then I should not see "Community spotlight" within ".col-md-9"
+Scenario: sorting the aspects
+Given I am signed in
+And I have an aspect called "People"
+And I have an aspect called "Cat People"
+When I am on the contacts page
+And I drag "Cat People" up
+And I go to the contacts page
+Then I should see "Cat People" as 2. aspect
+And I should see "People" as 3. aspect
+Feature: Close account
+In order to close an existing account
+As a user
+I want to sign in, close my account and try to log in again
+Scenario: user closes account
+Given I am signed in
+When I go to the users edit page
+And I click on selector "#close_account"
+Then I should see a modal
+And I should see "Hey, please don’t go!" within "#closeAccountModal"
+When I put in my password in the close account modal
+And I press "close_account_confirm"
+And I confirm the alert
+Then I should be on the mobile new user session page
+When I try to sign in manually
+Then I should be on the new user session page
+And I should see a flash message with a warning
+Feature: viewing photos on the mobile main page
+In order to navigate Diaspora*
+As a mobile user
+I want to view some photos
+Background:
+Given a user with username "bob"
+When I sign in as "bob@bob.bob" on the mobile website
+And I click on selector "#compose_badge"
+Scenario: view full size image
+Given I attach the file "spec/fixtures/button.png" to hidden "file" within "#file-upload-publisher"
+When I press "Share"
+And I click on selector "img.stream-photo"
+Then I should see a "img" within "#show_content"
+And I should not see a "#arrow-right" within "#main"
+And I should not see a "#arrow-left" within "#main"
+Scenario: view multiphoto post
+Given I attach the file "spec/fixtures/button.png" to hidden "file" within "#file-upload-publisher"
+And I attach the file "spec/fixtures/button.gif" to hidden "file" within "#file-upload-publisher"
+When I press "Share"
+Then I should see "+ 1" within ".additional_photo_count"
+When I click on selector "img.stream-photo"
+Then I should see a "#arrow-right" within "#main"
+And I should not see a "#arrow-left" within "#main"
+When I click on selector "#arrow-right"
+Then I should see a "#arrow-left" within "#main"
+And I should not see a "#arrow-right" within "#main"

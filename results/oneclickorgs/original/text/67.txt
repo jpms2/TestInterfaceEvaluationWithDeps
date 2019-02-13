@@ -1,0 +1,728 @@
+Feature: Accepting a founding member invitation
+In order to participate in the founding of my group as an association
+As a member of the group
+I want to accept an invitation to become a founding member
+Background:
+Given the application is set up
+And an association has been created
+@javascript
+Scenario: Accepting a founding member invitation
+Given I have received an email inviting me to become a founding member
+When I follow the invitation link in the email
+And I fill in "Password" with "letmein"
+And I fill in "Password confirmation" with "letmein"
+And I press "Continue"
+And I press "I accept these terms"
+Then I should be on the constitution page
+Feature: Amending draft association settings
+In order to make sure the constitution fits our needs
+As a founder
+I want to amend the draft association's settings
+Background:
+Given the application is set up
+And I have created an association
+Scenario: Amending draft association settings
+When I go to the amendments page
+And I fill in the organisation name with "Tea Club Mark II"
+And I fill in the objectives with "REALLY enjoying tea"
+And I choose "Absolute majority" for general decisions
+And I choose "Unanimous" for membership decisions
+And I choose "Simple majority" for constitution decisions
+And I choose "5 minutes"
+And I press "Save changes"
+Then I should be on the constitution page
+And I should see "Constitutional changes were made"
+And I should see "Tea Club Mark II"
+And I should see "REALLY enjoying tea"
+And I should see "5 minutes"
+And I should see "A Decision is made if a Proposal receives Supporting Votes from more than half of Members during the Voting Period. "
+And I should see "The Constitution may only be amended by a Decision where Supporting Votes from more than half of the Members are received during the Voting Period; or when more Supporting Votes than Opposing Votes have been received for the Proposal at the end of the Voting Period."
+And I should see "New Members may be appointed (and existing Members ejected) only by a Decision where Supporting Votes are received from all Members during the Voting Period."
+Feature: Creating an association
+In order to get my group up and running quickly
+As a member of a group
+I want to create a One Click Orgs association
+Background:
+Given the application is set up
+@javascript
+Scenario: Creating an association
+When the domain is the signup domain
+And I go to the new association page
+And I fill in "First name" with "Bob"
+And I fill in "Last name" with "Smith"
+And I fill in "Email address" with "bob@example.com"
+And I fill in "Choose password" with "letmein"
+And I fill in "Confirm password" with "letmein"
+And I fill in "Association's official name" with "The Tea Club"
+And I fill in "One Click Orgs web address" with "tea"
+And I fill in "What the Association exists for" with "Enjoying tea"
+And I press "Create draft constitution"
+And I press "I accept the terms"
+Then I should be on the constitution page
+And the subdomain should be "tea"
+And I should see a welcome notification
+And I should receive a welcome email
+Feature: Holding the founding vote
+In order to give our group a legal structure
+As a founding member
+I want to participate in the founding vote
+Background:
+Given the application is set up
+And an association has been created
+And there are enough members to start the founding vote
+And the founding vote has been started
+And I am a founding member
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Viewing progress of the founding vote
+When I go to the members page
+Then I should see "Not yet voted" within the list of founding members
+Scenario: Voting in the founding vote
+When I go to the home page
+Then I should see "Founding vote in progress"
+When I press "Support"
+Then I should see "Vote for proposal cast"
+Scenario: Founding vote passes
+Given everyone has voted to support the founding
+When the proposal closer runs
+Then everyone should receive an email saying the founding vote has passed
+And the organisation should be active
+Scenario: Seeing who has joined the new org
+Given one member voted against the founding
+But the founding vote still passed
+And I have received the email saying the founding vote has passed
+Then the email should list the members who voted in favour of the founding
+And the email should not list the member who voted against the founding
+Feature: Inviting founding members
+In order to get members of my group involved in the founding of our association
+As a founder
+I want to invite people to become founding members
+Background:
+Given the application is set up
+And I have created an association
+Scenario: Inviting founding members
+When I go to the members page
+And I fill in "Email Address" with "bob@example.com"
+And I fill in "First name" with "Bob"
+And I fill in "Last name" with "Smith"
+And I press "Send invitation"
+Then I should see "Added a new founding member"
+And I should see "Bob Smith" within the list of founding members
+And a founding member invitation email should be sent to "bob@example.com"
+Feature: Starting the founding vote
+In order to found our association
+As a founder
+I want to start the founding vote
+Background:
+Given the application is set up
+And I have created an association
+And there are enough members to start the founding vote
+@javascript
+Scenario: Starting the founding vote
+When I go to the home page
+And I press "Hold the Founding Vote"
+And I press "Confirm"
+Then I should see "Founding vote in progress"
+And everyone should receive an email saying that the founding vote has started
+Feature: Viewing draft association details
+In order to decide whether I want to join in founding a draft association
+As a founding member
+I want to view details of the draft association
+Background:
+Given the application is set up
+And an association has been created
+And I am a founding member
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Viewing the draft constitution
+When I go to the constitution page
+Then I should see the draft constitution
+Scenario: Viewing the list of founding members
+When I go to the members page
+Then I should see the list of founding members
+Feature: Show failed proposal notification
+As a founder
+I want to know when a founding vote fails
+In order to know respond to it
+Scenario: failing vote should show notification
+Given the application is set up
+And an association has been created
+And there are enough members to start the founding vote
+And the founding vote has been started
+And I am a founding member
+And the subdomain is the organisation's subdomain
+And everyone has voted against the founding
+And the proposal closer runs
+And I have logged in
+Then I should see "Sorry, the Founding Vote has failed."
+When another founding vote has been started
+And everyone has voted against the founding
+And the proposal closer runs
+And I go to the home page
+Then I should see "Sorry, the Founding Vote has failed."
+Scenario: The notification for a given subsequent failed founding vote is only shown once
+Given the application is set up
+And an association has been created
+And there are enough members to start the founding vote
+And the founding vote has been started
+And I am a founding member
+And the subdomain is the organisation's subdomain
+And everyone has voted against the founding
+And the proposal closer runs
+And I have logged in
+Then I should see "Sorry, the Founding Vote has failed."
+When another founding vote has been started
+And everyone has voted against the founding
+And the proposal closer runs
+And I go to the home page
+Then I should see "Sorry, the Founding Vote has failed."
+When I go to the members page
+Then I should not see "Sorry, the Founding Vote has failed."
+Feature: Show 'founding vote passed' notification
+As a founding member
+I want to know that the founding vote has passed
+In order to know respond to it
+Background:
+Given the application is set up
+And an association has been created
+And there are enough members to start the founding vote
+And the founding vote has been started
+And I am a founding member
+And the subdomain is the organisation's subdomain
+And one member voted against the founding
+But the founding vote still passed
+Scenario: Founding vote passed notification should list the appropriate members
+When I log in
+Then I should see "These are the Founding Members"
+And I should see a list of the members who voted in favour of the founding
+But I should not see the member who voted against the founding
+Feature: Accepting an invitation
+In order to participate in an association
+As an invitee
+I want to accept an invitation to join an association
+Background:
+Given the application is set up
+And an association is active
+And I have been invited to join the organisation
+@javascript
+Scenario: Accepting an invitation
+Given I have received an email inviting me to become a member
+When I follow the invitation link in the email
+And I fill in "Password" with "letmein"
+And I fill in "Password confirmation" with "letmein"
+And I press "Continue"
+And I press "I accept these terms"
+Then I should be on the welcome page
+And I press "I agree to abide by the constitution"
+Then I should be on the voting and proposals page
+Feature: Amending association settings
+In order to make sure the constitution fits our needs
+As a member
+I want to propose amendments to our association's settings
+Background:
+Given the application is set up
+And an association is active
+And I am a member of the organisation
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Amending association settings
+When I go to the amendments page
+And I fill in the organisation name with "Tea Club Mark II"
+And I fill in the objectives with "REALLY enjoying tea"
+And I choose "Absolute majority" for general decisions
+And I choose "Unanimous" for membership decisions
+And I choose "Simple majority" for constitution decisions
+And I choose "5 minutes"
+And I press "Propose changes"
+Then I should be on the voting and proposals page
+And I should see a proposal "Change organisation name to 'Tea Club Mark II'"
+And I should see a proposal "Change organisation objectives to 'REALLY enjoying tea'"
+And I should see a proposal "Change general voting system to Absolute majority: decisions need supporting votes from more than 50% of members"
+And I should see a proposal "Change membership voting system to Unanimous: decisions need supporting votes from 100% of members"
+And I should see a proposal "Change constitution voting system to Simple majority: decisions need more supporting votes than opposing votes"
+And I should see a proposal "Change voting period to 5 minutes"
+Feature: Commenting on a proposal
+In order to share my opinions about a proposal
+As a member
+I want to leave a comment on a proposal
+Background:
+Given the application is set up
+And an association is active
+And I am a member of the organisation
+And a proposal "Buy more tea" has been made
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Member comments on a proposal
+When I go to the proposal page
+And I enter a comment of "Sounds good to me."
+And I press "Save comment"
+Then I should be on the proposal page
+And I should see a comment by me saying "Sounds good to me."
+Feature: Editing profile
+In order to keep my details up to date
+As a member
+I want to edit my profile
+Background:
+Given the application is set up
+And an association is active
+And I am a member of the organisation
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Editing profile
+When I go to the home page
+And I follow "Edit your account"
+And I fill in "First name" with "Nouveau"
+And I fill in "Last name" with "Atarashii"
+And I fill in "Email" with "nouveau@example.com"
+And I fill in "Role" with "Secretary"
+And I press "Save changes"
+Then I should see "Account updated"
+And I should see "Nouveau Atarashii"
+And I should see "nouveau@example.com"
+And I should see "Secretary"
+Feature: Exporting member data
+As a member
+I want to be able to export my member data
+Background:
+Given the application is set up
+And an association is active
+And I am a member of the organisation
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Downloading a pdf member list
+When I am on the members page
+And I follow "PDF"
+Then I should get a ".pdf" download with the name of the organisation
+Scenario: Downloading a csv member list
+When I am on the members page
+And I follow "CSV"
+Then I should get a ".csv" download with the name of the organisation
+Feature: Making a proposal
+In order to get participation in group decisions
+As a member
+I want to make a proposal
+Background:
+Given the application is set up
+And an association is active
+And I am a member of the organisation
+And the subdomain is the organisation's subdomain
+And I have logged in
+@javascript
+Scenario: Making a proposal
+When I go to the voting and proposals page
+And I press "Propose a vote"
+And I fill in "Title" with "We should buy more tea"
+And I fill in "Description" with "So we can drink more tea."
+And I press "Create proposal"
+Then I should be on the proposal page
+And I should see "We should buy more tea"
+And I should see "So we can drink more tea."
+And everyone should receive an email notifying them of the proposal
+Feature: Making decisions
+In order to make group decisions official
+As a member
+I want passed votes to be enacted as decisions
+Background:
+Given the application is set up
+And an association is active
+And I am a member of the organisation
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: A general vote passes
+Given a proposal "Buy more tea" has been made
+When enough people vote in support of the proposal
+And the proposal closer runs
+And I go to the voting and proposals page
+Then I should see "A decision was made: Buy more tea"
+Scenario: A constitutional vote passes
+Given the organisation's name is "The Tea Club"
+And a proposal has been made to change the organisation name to "Tea Club Mark II"
+When enough people vote in support of the proposal
+And the proposal closer runs
+And I go to the voting and proposals page
+Then I should see "A decision was made: Change organisation name to 'Tea Club Mark II'"
+When I go to the constitution page
+Then I should see a clause with "Tea Club Mark II"
+Scenario: An vote passes to add a new member
+Given the voting system for membership decisions is "RelativeMajority"
+And a proposal has been made to add a new member with name "Bob Smith" and email "bob@example.com"
+When enough people vote in support of the proposal
+And the proposal closer runs
+And I go to the voting and proposals page
+Then I should see "A decision was made: Add Bob Smith as a member"
+When I go to the members page
+Then I should see "Bob Smith" within the list of pending members
+Scenario: An vote passes to eject a member
+Given the voting system for membership decisions is "RelativeMajority"
+And there is a member with name "Bob Smith" and email "bob@example.com"
+And a proposal has been made to eject the member "bob@example.com"
+When enough people vote in support of the proposal
+And the proposal closer runs
+And I go to the voting and proposals page
+Then I should see "A decision was made: Eject Bob Smith"
+When I go to the members page
+Then I should not see "Bob Smith"
+Feature: Proposing a new member
+In order to involve a new person in the running of the association
+As a member
+I want to propose a new member
+Background:
+Given the application is set up
+And an association is active
+And I am a member of the organisation
+And the subdomain is the organisation's subdomain
+And I have logged in
+@javascript
+Scenario: Proposing a new member
+When I go to the voting and proposals page
+And I press "Propose a new member"
+And I fill in "Email" with "bob@example.com"
+And I fill in "First name" with "Bob"
+And I fill in "Last name" with "Smith"
+And I press "Invite member"
+Then I should see "Add Member Proposal successfully created"
+And everyone should receive an email notifying them of the proposal
+When I go to the voting and proposals page
+Then I should see a proposal to add "Bob Smith" as a member
+Feature: Proposing ejection of a member
+In order to remove a member who shouldn't be involved anymore
+As a member
+I want to propose the ejection of a member
+Background:
+Given the application is set up
+And an association is active
+And I am a member of the organisation
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Proposing ejection of a member
+Given there is a member "bob@example.com"
+When I go to the member page for "bob@example.com"
+And I press "Create proposal to eject this member"
+Then I should see a proposal to eject "bob@example.com"
+And everyone should receive an email notifying them of the proposal
+Feature: Resigning from a an association
+In order to leave an association formally
+As a member
+I want to be able to resign from my positions inside it.
+Background:
+Given the application is set up
+And an association is active
+And I am a member of the organisation
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Resigning
+Given I am on my account page
+And I click on the resign link, and confirm my leaving
+Then I should be logged out, with a message telling me I have resigned.
+Scenario: Being notified of another member's resignation
+Given another member has resigned
+Then I should receive an email saying that member has resigned
+Scenario: Seeing a resignation in the timeline
+Given another member has resigned
+When I go to the dashboard
+Then I should see the resignation in the timeline
+Feature: Viewing association details
+In order to understand my association
+As a member
+I want to view details of the association
+Background:
+Given the application is set up
+And an association is active
+And I am a member of the organisation
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Viewing votes and proposals
+Given a proposal has been made
+When I go to the voting and proposals page
+Then I should see a list of votes in progress
+And I should see a list of recent activity
+Scenario: Viewing the constitution
+When I go to the constitution page
+Then I should see the constitution
+Scenario: Viewing the list of members
+Given there are active members
+And there are pending members
+When I go to the members page
+Then I should see the list of members
+And I should see a list of pending members
+Scenario: Viewing a member
+When I go to a member's page
+Then I should see the member's details
+And I should see a list of recent activity by the member
+Feature: Voting
+In order to participate in group decisions
+As a member
+I want to vote on proposals that have been made
+Background:
+Given the application is set up
+And an association is active
+And I am a member of the organisation
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Voting on a general proposal
+Given a proposal "Buy more tea" has been made
+When I go to the voting and proposals page
+And I press "Support" within the "Buy more tea" proposal
+Then I should see "Vote for proposal cast"
+And I should see "You voted to support this proposal" within the "Buy more tea" proposal
+Feature: Adding a company
+In order to start running a company virtually
+As a director
+I want to add an existing company to the instance
+Background:
+Given the application is set up
+Scenario: Director adds a company
+Given the domain is the signup domain
+When I go to the new company page
+And I fill in "First name" with "Bob"
+And I fill in "Last name" with "Smith"
+And I fill in "Email address" with "bob@example.com"
+And I fill in "Choose password" with "letmein"
+And I fill in "Confirm password" with "letmein"
+And I fill in "Company's official name" with "Coffee Ventures Ltd"
+And I fill in "One Click Orgs web address" with "coffee"
+And I press "Add company"
+Then I should be on the Votes & Minutes page
+And the subdomain should be "coffee"
+Feature: Accepting an invitation
+In order to participate in company
+As a new director
+I want to accept an invitation to sign up
+Background:
+Given the application is set up
+And a company has been added
+And I have been invited to sign up as a director
+@javascript
+Scenario: Accepting an invitation
+Given I have received an email inviting me to sign up as a director
+When I follow the invitation link in the email
+And I fill in "Password" with "letmein"
+And I fill in "Password confirmation" with "letmein"
+And I press "Continue"
+And I press "I accept these terms"
+Then I should be on the Votes & Minutes page
+Feature: Adding a director
+In order to reflect changes in directorship
+As a director
+I want to add a new director
+Background:
+Given the application is set up
+And a company has been added
+And I am a director of the company
+And there are two other directors of the company
+And the subdomain is the organisation's subdomain
+And I have logged in
+@javascript
+Scenario: Director adds a new director
+When I go to the Directors page
+And I press "Add a new director"
+And I fill in "Email" with "bob@example.com"
+And I fill in "First name" with "Bob"
+And I fill in "Last name" with "Smith"
+And I choose yesterday for the date of election
+And I check the certification checkbox
+And I press "Add this director"
+Then I should be on the Directors page
+And I should see "Bob Smith" within the list of directors
+And a director invitation email should be sent to "bob@example.com"
+@javascript
+Scenario: Directors are notified of a new director
+When I add a new director
+Then all the directors should receive a "new director" email
+Feature: Authorisation
+Members should have the correct levels of authorisation.
+Background:
+Given the application is set up
+And a company has been added
+And I am a director of the company
+And there are two other directors of the company
+And the subdomain is the organisation's subdomain
+Scenario: Stood-down director should not be able to log in
+Given I have been stood down
+When I try to log in
+Then I should not be logged in
+Feature: Commenting on a proposal
+In order to share my opinions about a proposal
+As a director
+I want to leave a comment on a proposal
+Background:
+Given the application is set up
+And a company has been added
+And I am a director of the company
+And a proposal "Buy more tea" has been made
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Director comments on a proposal
+When I go to the proposal page
+And I enter a comment of "Sounds good to me."
+And I press "Save comment"
+Then I should be on the proposal page
+And I should see a comment by me saying "Sounds good to me."
+Feature: Commenting on minutes
+In order to register my disagreement with the accuracy of some minutes
+As a director
+I want to comment on some minutes
+Background:
+Given the application is set up
+And a company has been added
+And I am a director of the company
+And there are two other directors of the company
+And another director has recorded some minutes
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Director comments on minutes
+When I go to the page for the minutes
+And I enter a comment of "I didn't say that!"
+And I press "Save comment"
+Then I should be on the page for the minutes
+And I should see a comment by me saying "I didn't say that!"
+Feature: Editing profile
+In order to keep my details up to date
+As a director
+I want to edit my profile
+Background:
+Given the application is set up
+And a company has been added
+And the company has directors
+And I am a director of the company
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Editing profile
+When I go to the home page
+And I follow "Edit your account"
+And I fill in "First name" with "Nouveau"
+And I fill in "Last name" with "Atarashii"
+And I fill in "Email" with "nouveau@example.com"
+And I press "Save changes"
+Then I should see "Account updated"
+And I should see "Nouveau Atarashii"
+And my email should be "nouveau@example.com"
+Feature: Making a proposal
+In order to get participation in group decisions
+As a director
+I want to make a proposal
+Background:
+Given the application is set up
+And a company has been added
+And I am a director of the company
+And the subdomain is the organisation's subdomain
+And I have logged in
+@javascript
+Scenario: Making a proposal
+When I go to the Votes & Minutes page
+And I press "Propose a vote"
+And I fill in "Title" with "We should buy more tea"
+And I fill in "Description" with "So we can drink more tea."
+And I press "Create proposal"
+Then I should be on the proposal page
+And I should see "We should buy more tea"
+And I should see "So we can drink more tea."
+And everyone should receive an email notifying them of the proposal
+Feature: Making decisions
+In order to make group decisions official
+As a director
+I want passed votes to be enacted as decisions
+Background:
+Given the application is set up
+And a company has been added
+And the company has directors
+And I am a director of the company
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: A general vote passes
+Given a proposal "Buy more tea" has been made
+When enough people vote in support of the proposal
+And the proposal closer runs
+And I go to the voting and proposals page
+Then I should see "A decision was made: Buy more tea"
+Feature: Recording minutes
+In order to comply with company articles regarding meetings of directors
+As a director
+I want make a record of minutes of directors' meetings
+Background:
+Given the application is set up
+And a company has been added
+And I am a director of the company
+And there are two other directors of the company
+And the subdomain is the organisation's subdomain
+And I have logged in
+@javascript
+Scenario: Director records minutes
+Given I am on the Votes & Minutes page
+When I press "Record minutes"
+Then I should see a form for recording minutes
+And I should see a checkbox for each director
+When I choose the date of discussion
+And I check the first two directors' checkboxes
+And I fill in "What was discussed" with "Preferred coffee suppliers."
+And I press "Submit"
+Then I should see the minutes for "Preferred coffee suppliers" in the timeline
+When I follow "Preferred coffee suppliers"
+Then I should see the first two directors' names as participants
+Scenario: Director receives email notification of new minutes
+Given another director has recorded some new minutes
+Then I should receive an email notifying me of the new minutes
+And I should see a link to the minutes in the email
+When I click the link in the email
+Then I should see the minutes
+Feature: Standing down director
+In order to reflect changes in directorship
+As a director
+I want to stand down a director
+Background:
+Given the application is set up
+And a company has been added
+And I am a director of the company
+And there are two other directors of the company
+And the subdomain is the organisation's subdomain
+And I have logged in
+@javascript
+Scenario: Directors stands down another director
+Given I am on the Directors page
+When I press "Stand down" for another director
+Then I should see a form for standing down the director
+When I submit the form to stand down the director
+Then I should be on the Directors page
+And I should not see the director
+@javascript
+Scenario: Directors are notified of a director standing down
+When I stand down a director
+Then all the directors should receive a "stood down" email
+Feature: Voting
+In order to participate in group decisions
+As a director
+I want to vote on proposals that have been made
+Background:
+Given the application is set up
+And a company has been added
+And the company has directors
+And I am a director of the company
+And the subdomain is the organisation's subdomain
+And I have logged in
+Scenario: Voting on a general proposal
+Given a proposal "Buy more tea" has been made
+When I go to the Votes & Minutes page
+And I press "Support" within the "Buy more tea" proposal
+Then I should see "Vote for proposal cast"
+And I should see "You voted to support this proposal" within the "Buy more tea" proposal
+Feature: Setting up an installation
+As an administrator
+I want to set up an installation of One Click Orgs
+So that people can use One Click Orgs
+Background:
+Given the application is not set up yet
+Scenario: Setting up the installation
+Given I am on the setup page
+When I fill in "base domain" with "example.com"
+And I fill in "sign-up domain" with "create.example.com"
+And I press "Save domains"
+Then I should be on the new association page
+And the domain should be "create.example.com"
+Feature: Show notification once
+Notifications like the 'convener_welcome' should only be shown once.
+Scenario: Convener welcome is only shown once
+Given the application is set up
+When I create an association
+Then I should see "Now you can read the constitution"
+When I go to the members page
+Then I should not see "Now you can read the constitution"

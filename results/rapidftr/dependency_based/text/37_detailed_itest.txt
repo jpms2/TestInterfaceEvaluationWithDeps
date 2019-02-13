@@ -1,0 +1,293 @@
+Classes: 26
+[name:Array, file:null, step:Given ]
+[name:Capybara, file:null, step:Given ]
+[name:Capybara, file:null, step:When ]
+[name:Child, file:rapidftr_RapidFTR\app\models\child.rb, step:Given ]
+[name:Child, file:rapidftr_RapidFTR\app\models\child.rb, step:When ]
+[name:ChildRecordToolbarWidget, file:rapidftr_RapidFTR\features\support\pages\child_record_toolbar_widget.rb, step:When ]
+[name:DataPopulator, file:rapidftr_RapidFTR\features\support\data_populator.rb, step:Given ]
+[name:DateTime, file:null, step:Given ]
+[name:Enquiry, file:rapidftr_RapidFTR\app\models\enquiry.rb, step:Given ]
+[name:FactoryGirl, file:null, step:Given ]
+[name:Field, file:rapidftr_RapidFTR\app\models\field.rb, step:Given ]
+[name:Form, file:rapidftr_RapidFTR\app\models\form.rb, step:Given ]
+[name:FormSection, file:rapidftr_RapidFTR\app\models\form_section.rb, step:Given ]
+[name:LoginPage, file:rapidftr_RapidFTR\features\support\pages\login_page.rb, step:Given ]
+[name:Permission, file:rapidftr_RapidFTR\app\models\permission.rb, step:Given ]
+[name:Photo, file:rapidftr_RapidFTR\spec\support\matchers\photo.rb, step:Given ]
+[name:PotentialMatch, file:rapidftr_RapidFTR\app\models\potential_match.rb, step:Given ]
+[name:Rails, file:null, step:Given ]
+[name:Replication, file:rapidftr_RapidFTR\app\models\replication.rb, step:Given ]
+[name:Report, file:rapidftr_RapidFTR\app\models\report.rb, step:Given ]
+[name:Role, file:rapidftr_RapidFTR\app\models\role.rb, step:Given ]
+[name:Session, file:rapidftr_RapidFTR\app\models\session.rb, step:Given ]
+[name:Session, file:rapidftr_RapidFTR\app\models\session.rb, step:When ]
+[name:Spec, file:null, step:Then ]
+[name:Spec, file:null, step:When ]
+[name:User, file:rapidftr_RapidFTR\app\models\user.rb, step:Given ]
+
+Methods: 189
+[name:_id, type:Object, file:null, step:When ]
+[name:accept, type:Object, file:null, step:When ]
+[name:alert, type:Object, file:null, step:When ]
+[name:all, type:ChildIdsController, file:rapidftr_RapidFTR\app\controllers\child_ids_controller.rb, step:Given ]
+[name:all, type:Child, file:rapidftr_RapidFTR\app\models\child.rb, step:When ]
+[name:all_permissions, type:Permission, file:rapidftr_RapidFTR\app\models\permission.rb, step:Given ]
+[name:all_searchable_fields, type:FormSection, file:rapidftr_RapidFTR\app\models\form_section.rb, step:Given ]
+[name:be_nil, type:Object, file:null, step:Given ]
+[name:browser, type:Object, file:null, step:When ]
+[name:btn_submit, type:Object, file:null, step:Given ]
+[name:by_name, type:Child, file:rapidftr_RapidFTR\app\models\child.rb, step:Given ]
+[name:by_name, type:Form, file:rapidftr_RapidFTR\app\models\form.rb, step:Given ]
+[name:by_user_name, type:User, file:rapidftr_RapidFTR\app\models\user.rb, step:Given ]
+[name:call, type:Object, file:null, step:Given ]
+[name:change_password, type:UsersController, file:rapidftr_RapidFTR\app\controllers\users_controller.rb, step:Given ]
+[name:child_defaults, type:ChildrenSetupSteps, file:rapidftr_RapidFTR\features\step_definitions\children_setup_steps.rb, step:Given ]
+[name:child_record_toolbar, type:ChildRecordToolbarSteps, file:rapidftr_RapidFTR\features\step_definitions\child_record_toolbar_steps.rb, step:When ]
+[name:class, type:Object, file:null, step:Given ]
+[name:click_button, type:Object, file:null, step:When ]
+[name:click_link, type:Object, file:null, step:When ]
+[name:create, type:Form, file:rapidftr_RapidFTR\app\models\form.rb, step:Given ]
+[name:create, type:PotentialMatch, file:rapidftr_RapidFTR\app\models\potential_match.rb, step:Given ]
+[name:create, type:Role, file:rapidftr_RapidFTR\app\models\role.rb, step:Given ]
+[name:create_account, type:DataPopulator, file:rapidftr_RapidFTR\features\support\data_populator.rb, step:Given ]
+[name:create_admin, type:DataPopulator, file:rapidftr_RapidFTR\features\support\data_populator.rb, step:Given ]
+[name:create_child, type:ChildrenSetupSteps, file:rapidftr_RapidFTR\features\step_definitions\children_setup_steps.rb, step:Given ]
+[name:create_enquiry, type:EnquirySetupSteps, file:rapidftr_RapidFTR\features\step_definitions\enquiry_setup_steps.rb, step:Given ]
+[name:create_user, type:DataPopulator, file:rapidftr_RapidFTR\features\support\data_populator.rb, step:Given ]
+[name:data_populator, type:ChildrenSetupSteps, file:rapidftr_RapidFTR\features\step_definitions\children_setup_steps.rb, step:Given ]
+[name:data_populator, type:LoginSteps, file:rapidftr_RapidFTR\features\step_definitions\login_steps.rb, step:Given ]
+[name:delete, type:Object, file:null, step:Given ]
+[name:destroy, type:ChildrenController, file:rapidftr_RapidFTR\app\controllers\children_controller.rb, step:Given ]
+[name:destroy, type:FieldsController, file:rapidftr_RapidFTR\app\controllers\fields_controller.rb, step:Given ]
+[name:destroy, type:FormSectionController, file:rapidftr_RapidFTR\app\controllers\form_section_controller.rb, step:Given ]
+[name:destroy, type:PotentialMatchesController, file:rapidftr_RapidFTR\app\controllers\potential_matches_controller.rb, step:Given ]
+[name:destroy, type:ReplicationsController, file:rapidftr_RapidFTR\app\controllers\replications_controller.rb, step:Given ]
+[name:destroy, type:SessionsController, file:rapidftr_RapidFTR\app\controllers\sessions_controller.rb, step:Given ]
+[name:destroy, type:SystemUsersController, file:rapidftr_RapidFTR\app\controllers\system_users_controller.rb, step:Given ]
+[name:destroy, type:UsersController, file:rapidftr_RapidFTR\app\controllers\users_controller.rb, step:Given ]
+[name:destroy, type:Form, file:rapidftr_RapidFTR\app\models\form.rb, step:Given ]
+[name:destroy, type:SessionsController, file:rapidftr_RapidFTR\app\controllers\api\sessions_controller.rb, step:Given ]
+[name:destroy_form, type:BasicSteps, file:rapidftr_RapidFTR\features\step_definitions\basic_steps.rb, step:Given ]
+[name:downcase, type:Object, file:null, step:Given ]
+[name:driver, type:Object, file:null, step:When ]
+[name:each, type:Object, file:null, step:Given ]
+[name:edit, type:UsersController, file:rapidftr_RapidFTR\app\controllers\users_controller.rb, step:Given ]
+[name:edit, type:FormSectionController, file:rapidftr_RapidFTR\app\controllers\form_section_controller.rb, step:Given ]
+[name:edit, type:FieldsController, file:rapidftr_RapidFTR\app\controllers\fields_controller.rb, step:Given ]
+[name:edit, type:ChildrenController, file:rapidftr_RapidFTR\app\controllers\api\children_controller.rb, step:Given ]
+[name:edit, type:ChildrenController, file:rapidftr_RapidFTR\app\controllers\children_controller.rb, step:Given ]
+[name:edit, type:EnquiriesController, file:rapidftr_RapidFTR\app\controllers\api\enquiries_controller.rb, step:Given ]
+[name:edit, type:EnquiriesController, file:rapidftr_RapidFTR\app\controllers\enquiries_controller.rb, step:Given ]
+[name:edit, type:ReplicationsController, file:rapidftr_RapidFTR\app\controllers\replications_controller.rb, step:Given ]
+[name:edit, type:RolesController, file:rapidftr_RapidFTR\app\controllers\roles_controller.rb, step:Given ]
+[name:edit, type:SystemUsersController, file:rapidftr_RapidFTR\app\controllers\system_users_controller.rb, step:Given ]
+[name:empty?, type:Object, file:null, step:Given ]
+[name:enquiry_defaults, type:EnquirySetupSteps, file:rapidftr_RapidFTR\features\step_definitions\enquiry_setup_steps.rb, step:Given ]
+[name:ensure_user_exists, type:DataPopulator, file:rapidftr_RapidFTR\features\support\data_populator.rb, step:Given ]
+[name:enter_password, type:LoginPage, file:rapidftr_RapidFTR\features\support\pages\login_page.rb, step:Given ]
+[name:enter_username, type:LoginPage, file:rapidftr_RapidFTR\features\support\pages\login_page.rb, step:Given ]
+[name:fail, type:Object, file:null, step:Given ]
+[name:fields, type:Object, file:null, step:Given ]
+[name:fill_in, type:Object, file:null, step:When ]
+[name:find, type:Enquiry, file:rapidftr_RapidFTR\app\models\enquiry.rb, step:Given ]
+[name:find, type:Object, file:null, step:Given ]
+[name:find, type:Object, file:null, step:When ]
+[name:find_by_name, type:Form, file:rapidftr_RapidFTR\app\models\form.rb, step:Given ]
+[name:find_by_name, type:Role, file:rapidftr_RapidFTR\app\models\role.rb, step:Given ]
+[name:find_by_user_name, type:User, file:rapidftr_RapidFTR\app\models\user.rb, step:Given ]
+[name:first, type:Object, file:null, step:Given ]
+[name:flatten!, type:Object, file:null, step:Given ]
+[name:get, type:Child, file:rapidftr_RapidFTR\app\models\child.rb, step:Given ]
+[name:get_by_unique_id, type:FormSection, file:rapidftr_RapidFTR\app\models\form_section.rb, step:Given ]
+[name:gsub, type:Object, file:null, step:Given ]
+[name:has_content?, type:Object, file:null, step:Then ]
+[name:has_content?, type:Object, file:null, step:When ]
+[name:hashes, type:Object, file:null, step:Given ]
+[name:have_content, type:Object, file:null, step:Then ]
+[name:have_content, type:Object, file:null, step:When ]
+[name:have_selector, type:Object, file:null, step:Then ]
+[name:id, type:Searchable, file:rapidftr_RapidFTR\app\models\searchable.rb, step:Given ]
+[name:id, type:CsvExportTask, file:rapidftr_RapidFTR\lib\addons\csv_export_task.rb, step:Given ]
+[name:id, type:PdfExportTask, file:rapidftr_RapidFTR\lib\addons\pdf_export_task.rb, step:Given ]
+[name:id, type:PhotowallExportTask, file:rapidftr_RapidFTR\lib\addons\photowall_export_task.rb, step:Given ]
+[name:id, type:Role, file:rapidftr_RapidFTR\app\models\role.rb, step:Given ]
+[name:include?, type:Object, file:null, step:Given ]
+[name:index, type:ChildrenController, file:rapidftr_RapidFTR\app\controllers\api\children_controller.rb, step:Given ]
+[name:index, type:ChildrenController, file:rapidftr_RapidFTR\app\controllers\children_controller.rb, step:Given ]
+[name:index, type:ChildHistoriesController, file:rapidftr_RapidFTR\app\controllers\child_histories_controller.rb, step:Given ]
+[name:index, type:UsersController, file:rapidftr_RapidFTR\app\controllers\users_controller.rb, step:Given ]
+[name:index, type:AdvancedSearchController, file:rapidftr_RapidFTR\app\controllers\advanced_search_controller.rb, step:Given ]
+[name:index, type:FieldsController, file:rapidftr_RapidFTR\app\controllers\fields_controller.rb, step:Given ]
+[name:index, type:AdminController, file:rapidftr_RapidFTR\app\controllers\admin_controller.rb, step:Given ]
+[name:index, type:SystemUsersController, file:rapidftr_RapidFTR\app\controllers\system_users_controller.rb, step:Given ]
+[name:index, type:RolesController, file:rapidftr_RapidFTR\app\controllers\roles_controller.rb, step:Given ]
+[name:index, type:DevicesController, file:rapidftr_RapidFTR\app\controllers\devices_controller.rb, step:Given ]
+[name:index, type:ReplicationsController, file:rapidftr_RapidFTR\app\controllers\replications_controller.rb, step:Given ]
+[name:index, type:ReportsController, file:rapidftr_RapidFTR\app\controllers\reports_controller.rb, step:Given ]
+[name:index, type:FormSectionController, file:rapidftr_RapidFTR\app\controllers\form_section_controller.rb, step:Given ]
+[name:index, type:FormsController, file:rapidftr_RapidFTR\app\controllers\forms_controller.rb, step:Given ]
+[name:index, type:StandardFormsController, file:rapidftr_RapidFTR\app\controllers\standard_forms_controller.rb, step:Given ]
+[name:index, type:EnquiriesController, file:rapidftr_RapidFTR\app\controllers\api\enquiries_controller.rb, step:Given ]
+[name:index, type:EnquiriesController, file:rapidftr_RapidFTR\app\controllers\enquiries_controller.rb, step:Given ]
+[name:index, type:EnquiryHistoriesController, file:rapidftr_RapidFTR\app\controllers\enquiry_histories_controller.rb, step:Given ]
+[name:index, type:UserHistoriesController, file:rapidftr_RapidFTR\app\controllers\user_histories_controller.rb, step:Given ]
+[name:join, type:Object, file:null, step:Given ]
+[name:key, type:Object, file:null, step:Given ]
+[name:login, type:LoginPage, file:rapidftr_RapidFTR\features\support\pages\login_page.rb, step:Given ]
+[name:login, type:SessionsController, file:rapidftr_RapidFTR\app\controllers\api\sessions_controller.rb, step:Given ]
+[name:login_as, type:LoginPage, file:rapidftr_RapidFTR\features\support\pages\login_page.rb, step:Given ]
+[name:login_page, type:LoginSteps, file:rapidftr_RapidFTR\features\step_definitions\login_steps.rb, step:Given ]
+[name:mark_as_duplicate, type:ChildRecordToolbarWidget, file:rapidftr_RapidFTR\features\support\pages\child_record_toolbar_widget.rb, step:When ]
+[name:mark_as_duplicate, type:Child, file:rapidftr_RapidFTR\app\models\child.rb, step:When ]
+[name:match, type:Object, file:null, step:Given ]
+[name:name, type:FormSection, file:rapidftr_RapidFTR\app\models\form_section.rb, step:Given ]
+[name:name, type:Form, file:rapidftr_RapidFTR\app\models\form.rb, step:Given ]
+[name:name, type:Role, file:rapidftr_RapidFTR\app\models\role.rb, step:Given ]
+[name:name, type:User, file:rapidftr_RapidFTR\app\models\user.rb, step:Given ]
+[name:name, type:ApplicationController, file:rapidftr_RapidFTR\app\controllers\application_controller.rb, step:When ]
+[name:new, type:Form, file:rapidftr_RapidFTR\app\models\form.rb, step:Given ]
+[name:new, type:FormSection, file:rapidftr_RapidFTR\app\models\form_section.rb, step:Given ]
+[name:new, type:DataPopulator, file:rapidftr_RapidFTR\features\support\data_populator.rb, step:Given ]
+[name:new, type:User, file:rapidftr_RapidFTR\app\models\user.rb, step:Given ]
+[name:new, type:LoginPage, file:rapidftr_RapidFTR\features\support\pages\login_page.rb, step:Given ]
+[name:new, type:ChildrenController, file:rapidftr_RapidFTR\app\controllers\api\children_controller.rb, step:Given ]
+[name:new, type:ChildrenController, file:rapidftr_RapidFTR\app\controllers\children_controller.rb, step:Given ]
+[name:new, type:UsersController, file:rapidftr_RapidFTR\app\controllers\users_controller.rb, step:Given ]
+[name:new, type:SessionsController, file:rapidftr_RapidFTR\app\controllers\api\sessions_controller.rb, step:Given ]
+[name:new, type:SessionsController, file:rapidftr_RapidFTR\app\controllers\sessions_controller.rb, step:Given ]
+[name:new, type:FieldsController, file:rapidftr_RapidFTR\app\controllers\fields_controller.rb, step:Given ]
+[name:new, type:DuplicatesController, file:rapidftr_RapidFTR\app\controllers\duplicates_controller.rb, step:Given ]
+[name:new, type:RolesController, file:rapidftr_RapidFTR\app\controllers\roles_controller.rb, step:Given ]
+[name:new, type:FormSectionController, file:rapidftr_RapidFTR\app\controllers\form_section_controller.rb, step:Given ]
+[name:new, type:SystemUsersController, file:rapidftr_RapidFTR\app\controllers\system_users_controller.rb, step:Given ]
+[name:new, type:ChildRecordToolbarWidget, file:rapidftr_RapidFTR\features\support\pages\child_record_toolbar_widget.rb, step:When ]
+[name:new_password, type:Object, file:null, step:Given ]
+[name:new_password_confirmation, type:Object, file:null, step:Given ]
+[name:new_with_user_name, type:Enquiry, file:rapidftr_RapidFTR\app\models\enquiry.rb, step:Given ]
+[name:new_with_user_name, type:Child, file:rapidftr_RapidFTR\app\models\child.rb, step:Given ]
+[name:nil?, type:Object, file:null, step:Given ]
+[name:not_to, type:Object, file:null, step:Given ]
+[name:old_password, type:Object, file:null, step:Given ]
+[name:page, type:Object, file:null, step:Then ]
+[name:page, type:Object, file:null, step:When ]
+[name:password, type:Replication, file:rapidftr_RapidFTR\app\models\replication.rb, step:Given ]
+[name:password, type:User, file:rapidftr_RapidFTR\app\models\user.rb, step:Given ]
+[name:path_for_cuke_string, type:Paths, file:rapidftr_RapidFTR\features\support\paths.rb, step:Given ]
+[name:path_map, type:Paths, file:rapidftr_RapidFTR\features\support\paths.rb, step:Given ]
+[name:path_to, type:Paths, file:rapidftr_RapidFTR\features\support\paths.rb, step:Given ]
+[name:permissions, type:Role, file:rapidftr_RapidFTR\app\models\role.rb, step:Given ]
+[name:proc, type:Object, file:null, step:Given ]
+[name:push, type:Object, file:null, step:Given ]
+[name:reverse_merge!, type:Object, file:null, step:Given ]
+[name:routes, type:Object, file:null, step:Given ]
+[name:save!, type:Object, file:null, step:Given ]
+[name:search, type:SearchController, file:rapidftr_RapidFTR\app\controllers\search_controller.rb, step:Given ]
+[name:sections, type:Form, file:rapidftr_RapidFTR\app\models\form.rb, step:Given ]
+[name:select, type:Object, file:null, step:When ]
+[name:send, type:Object, file:null, step:Given ]
+[name:show, type:ChildrenController, file:rapidftr_RapidFTR\app\controllers\api\children_controller.rb, step:Given ]
+[name:show, type:ChildrenController, file:rapidftr_RapidFTR\app\controllers\children_controller.rb, step:Given ]
+[name:show, type:UsersController, file:rapidftr_RapidFTR\app\controllers\users_controller.rb, step:Given ]
+[name:show, type:EnquiriesController, file:rapidftr_RapidFTR\app\controllers\api\enquiries_controller.rb, step:Given ]
+[name:show, type:EnquiriesController, file:rapidftr_RapidFTR\app\controllers\enquiries_controller.rb, step:Given ]
+[name:show, type:FormSectionController, file:rapidftr_RapidFTR\app\controllers\form_section_controller.rb, step:Given ]
+[name:show, type:ReplicationsController, file:rapidftr_RapidFTR\app\controllers\replications_controller.rb, step:Given ]
+[name:show, type:ReportsController, file:rapidftr_RapidFTR\app\controllers\reports_controller.rb, step:Given ]
+[name:show, type:RolesController, file:rapidftr_RapidFTR\app\controllers\roles_controller.rb, step:Given ]
+[name:show, type:SystemUsersController, file:rapidftr_RapidFTR\app\controllers\system_users_controller.rb, step:Given ]
+[name:split, type:Object, file:null, step:Given ]
+[name:start, type:ReplicationsController, file:rapidftr_RapidFTR\app\controllers\replications_controller.rb, step:Given ]
+[name:stop, type:ReplicationsController, file:rapidftr_RapidFTR\app\controllers\replications_controller.rb, step:Given ]
+[name:switch_to, type:Object, file:null, step:When ]
+[name:to, type:Object, file:null, step:Then ]
+[name:to, type:Object, file:null, step:When ]
+[name:to_i, type:Object, file:null, step:Given ]
+[name:to_not, type:Object, file:null, step:Then ]
+[name:to_s, type:Object, file:null, step:Given ]
+[name:uploadable_photo, type:Object, file:null, step:Given ]
+[name:url_helpers, type:Object, file:null, step:Given ]
+[name:username, type:Replication, file:rapidftr_RapidFTR\app\models\replication.rb, step:Given ]
+[name:visible?, type:FormSection, file:rapidftr_RapidFTR\app\models\form_section.rb, step:Given ]
+[name:visit_page, type:LoginPage, file:rapidftr_RapidFTR\features\support\pages\login_page.rb, step:Given ]
+[name:visit_page, type:NewChildPage, file:rapidftr_RapidFTR\features\support\pages\new_child_page.rb, step:Given ]
+[name:with_scope, type:MoreWebSteps, file:rapidftr_RapidFTR\features\step_definitions\more_web_steps.rb, step:When ]
+[name:with_scope, type:WebSteps, file:rapidftr_RapidFTR\features\step_definitions\web_steps.rb, step:When ]
+[name:with_scope, type:MoreWebSteps, file:rapidftr_RapidFTR\features\step_definitions\more_web_steps.rb, step:Then ]
+[name:with_scope, type:WebSteps, file:rapidftr_RapidFTR\features\step_definitions\web_steps.rb, step:Then ]
+[name:within, type:Object, file:null, step:When ]
+
+Referenced pages: 72
+rapidftr_RapidFTR\app\views\admin\index.html.slim
+rapidftr_RapidFTR\app\views\advanced_search\index.html.erb
+rapidftr_RapidFTR\app\views\child_histories\index.html.erb
+rapidftr_RapidFTR\app\views\children\_filter_box.html.erb
+rapidftr_RapidFTR\app\views\children\_header.html.erb
+rapidftr_RapidFTR\app\views\children\_order_by_box.html.erb
+rapidftr_RapidFTR\app\views\children\_potential_matches.html.erb
+rapidftr_RapidFTR\app\views\children\_search_results.html.erb
+rapidftr_RapidFTR\app\views\children\_show_child_toolbar.erb
+rapidftr_RapidFTR\app\views\children\_summary_row.html.erb
+rapidftr_RapidFTR\app\views\children\edit.html.erb
+rapidftr_RapidFTR\app\views\children\edit_photo.html.erb
+rapidftr_RapidFTR\app\views\children\index.html.erb
+rapidftr_RapidFTR\app\views\children\new.html.erb
+rapidftr_RapidFTR\app\views\children\show.html.erb
+rapidftr_RapidFTR\app\views\devices\index.html.slim
+rapidftr_RapidFTR\app\views\duplicates\new.html.erb
+rapidftr_RapidFTR\app\views\enquiries\_filter_box.html.erb
+rapidftr_RapidFTR\app\views\enquiries\_header.html.erb
+rapidftr_RapidFTR\app\views\enquiries\_potential_matches.html.erb
+rapidftr_RapidFTR\app\views\enquiries\_search_results.html.erb
+rapidftr_RapidFTR\app\views\enquiries\_summary_row.html.erb
+rapidftr_RapidFTR\app\views\enquiries\edit.html.erb
+rapidftr_RapidFTR\app\views\enquiries\index.html.erb
+rapidftr_RapidFTR\app\views\enquiries\index_with_potential_matches.html.erb
+rapidftr_RapidFTR\app\views\enquiries\show.html.erb
+rapidftr_RapidFTR\app\views\enquiry_histories\index.html.erb
+rapidftr_RapidFTR\app\views\form_section\_add_field.html.erb
+rapidftr_RapidFTR\app\views\form_section\_delete_button.html.erb
+rapidftr_RapidFTR\app\views\form_section\_direction_button.html.erb
+rapidftr_RapidFTR\app\views\form_section\_form_section.html.erb
+rapidftr_RapidFTR\app\views\form_section\edit.html.erb
+rapidftr_RapidFTR\app\views\form_section\index.html.erb
+rapidftr_RapidFTR\app\views\form_section\new.html.erb
+rapidftr_RapidFTR\app\views\forms\index.html.erb
+rapidftr_RapidFTR\app\views\replications\_form.html.erb
+rapidftr_RapidFTR\app\views\replications\_index.html.erb
+rapidftr_RapidFTR\app\views\replications\edit.html.erb
+rapidftr_RapidFTR\app\views\replications\new.html.erb
+rapidftr_RapidFTR\app\views\replications\show.html.erb
+rapidftr_RapidFTR\app\views\reports\index.html.erb
+rapidftr_RapidFTR\app\views\roles\_editable_role.html.erb
+rapidftr_RapidFTR\app\views\roles\edit.html.erb
+rapidftr_RapidFTR\app\views\roles\index.html.erb
+rapidftr_RapidFTR\app\views\roles\new.html.erb
+rapidftr_RapidFTR\app\views\roles\show.html.erb
+rapidftr_RapidFTR\app\views\search\search.html.erb
+rapidftr_RapidFTR\app\views\sessions\new.html.erb
+rapidftr_RapidFTR\app\views\shared\_add_translations.html.erb
+rapidftr_RapidFTR\app\views\shared\_fields.html.erb
+rapidftr_RapidFTR\app\views\shared\_form_section.html.erb
+rapidftr_RapidFTR\app\views\shared\_pagination.html.erb
+rapidftr_RapidFTR\app\views\shared\_show_form_section.html.erb
+rapidftr_RapidFTR\app\views\shared\_side_tab.html.erb
+rapidftr_RapidFTR\app\views\shared\_sidebar.html.erb
+rapidftr_RapidFTR\app\views\shared\_tabs.html.erb
+rapidftr_RapidFTR\app\views\shared\_tabs_panel.html.erb
+rapidftr_RapidFTR\app\views\standard_forms\index.html.erb
+rapidftr_RapidFTR\app\views\system_users\_form.html.erb
+rapidftr_RapidFTR\app\views\system_users\edit.html.erb
+rapidftr_RapidFTR\app\views\system_users\index.html.erb
+rapidftr_RapidFTR\app\views\system_users\new.html.erb
+rapidftr_RapidFTR\app\views\user_histories\_no_activities.html.erb
+rapidftr_RapidFTR\app\views\user_histories\index.html.erb
+rapidftr_RapidFTR\app\views\users\_editable_user.html.erb
+rapidftr_RapidFTR\app\views\users\_mobile_login_history.html.erb
+rapidftr_RapidFTR\app\views\users\_users_table.html.erb
+rapidftr_RapidFTR\app\views\users\change_password.html.erb
+rapidftr_RapidFTR\app\views\users\edit.html.erb
+rapidftr_RapidFTR\app\views\users\index.html.erb
+rapidftr_RapidFTR\app\views\users\new.html.erb
+rapidftr_RapidFTR\app\views\users\show.html.erb
+

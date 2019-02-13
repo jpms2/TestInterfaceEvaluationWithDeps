@@ -1,0 +1,4 @@
+[path:\features\step_definitions\document_steps.rb, methods:[96, 88, 175]]
+[path:\features\step_definitions\needs_steps.rb, methods:[0, 4]]
+[path:\features\step_definitions\publication_steps.rb, methods:[9]]
+[path:\features\support\javascript.rb, methods:[[name:select, step:When ], [name:select_from_chosen, step:When ]]]

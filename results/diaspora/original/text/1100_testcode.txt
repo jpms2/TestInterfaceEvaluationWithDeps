@@ -1,0 +1,102 @@
+Given /^(?:|I )am on (.+)$/ do |page_name|
+  navigate_to(page_name)
+end
+  def navigate_to(page_name)
+    path = path_to(page_name)
+    unless path.is_a?(Hash)
+      visit(path)
+    else
+      visit(path[:path])
+      await_elem = path[:special_elem]
+      find(await_elem.delete(:selector), await_elem)
+    end
+  end
+  def path_to(page_name)
+    case page_name
+      when /^person_photos page$/
+         person_photos_path(@me.person)
+      when /^the home(?: )?page$/
+        stream_path
+      when /^the mobile path$/
+        force_mobile_path
+      when /^step (\d)$/
+        if $1.to_i == 1
+          getting_started_path
+        else
+          getting_started_path(:step => $1)
+        end
+      when /^the tag page for "([^\"]*)"$/
+        tag_path($1)
+      when /^its ([\w ]+) page$/
+        send("#{$1.gsub(/\W+/, '_')}_path", @it)
+      when /^the ([\w ]+) page$/
+        send("#{$1.gsub(/\W+/, '_')}_path")
+      when /^my edit profile page$/
+        edit_profile_path
+      when /^my profile page$/
+        person_path(@me.person)
+      when /^my acceptance form page$/
+        invite_code_path(InvitationCode.first)
+      when /^the requestors profile$/
+        person_path(Request.where(:recipient_id => @me.person.id).first.sender)
+      when /^"([^\"]*)"'s page$/
+        p = User.find_by_email($1).person
+        { path: person_path(p),
+          # '#diaspora_handle' on desktop, '.description' on mobile
+          special_elem: { selector: '#diaspora_handle, .description', text: p.diaspora_handle }
+        }
+      when /^"([^\"]*)"'s photos page$/
+        p = User.find_by_email($1).person
+        person_photos_path p
+      when /^my account settings page$/
+        edit_user_path
+      when /^forgot password page$/
+          new_user_password_path
+      when /^"(\/.*)"/
+        $1
+      else
+        raise "Can't find mapping from \"#{page_name}\" to a path."
+    end
+  end
+When /^I press the "([^\"]*)" key somewhere$/ do |key|
+  within("#main_stream") do
+    find("div.stream_element", match: :first).native.send_keys(key)
+  end
+end
+Then /^post (\d+) should be highlighted$/ do |position|
+  find(".shortcut_selected .post-content").text.should == stream_element_numbers_content(position).text
+end
+And /^I should have navigated to the highlighted post$/ do
+  find(".shortcut_selected")["offsetTop"].to_i.should == page.evaluate_script("window.pageYOffset + 50").to_i
+end
+  def stream_element_numbers_content(position)
+    find(".stream_element:nth-child(#{position}) .post-content")
+  end
+Given /^many posts from alice for bob$/ do
+  alice = FactoryGirl.create(:user_with_aspect, :username => 'alice', :email => 'alice@alice.alice', :password => 'password', :getting_started => false)
+  bob = FactoryGirl.create(:user_with_aspect, :username => 'bob', :email => 'bob@bob.bob', :password => 'password', :getting_started => false)
+  connect_users_with_aspects(alice, bob)
+  time_fulcrum = Time.now - 40000
+  time_interval = 1000
+  (1..30).each do |n|
+    post = alice.post :status_message, :text => "#{alice.username} - #{n} - #seeded", :to => alice.aspects.where(:name => "generic").first.id
+    post.created_at = time_fulcrum - time_interval
+    post.updated_at = time_fulcrum + time_interval
+    post.save
+    time_interval += 1000
+  end
+end
+When /^I (?:sign|log) in as "([^"]*)"$/ do |email|
+  @me = User.find_by_email(email)
+  @me.password ||= 'password'
+  automatic_login
+  confirm_login
+end
+  def automatic_login
+    @me ||= FactoryGirl.create(:user_with_aspect, :getting_started => false)
+    visit(new_integration_sessions_path(:user_id => @me.id))
+    click_button "Login"
+  end
+  def confirm_login
+    page.has_content?("#{@me.first_name} #{@me.last_name}")
+  end

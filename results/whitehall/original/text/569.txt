@@ -1,0 +1,98 @@
+Feature: Consultations
+@not-quite-as-fake-search
+Scenario: Publishing a submitted consultation
+Given I am an editor
+And a submitted consultation "Beard Length Review" exists
+When I publish the consultation "Beard Length Review"
+Then I should see the consultation "Beard Length Review" in the list of published documents
+Scenario: Adding an outcome to a closed consultation
+Given I am an editor
+And a closed consultation exists
+When I add an outcome to the consultation
+And I save and publish the amended consultation
+Then I can see that the consultation has been published
+Scenario: Adding public feedback to a closed consultation
+Given I am an editor
+And a closed consultation exists
+When I add public feedback to the consultation
+And I save and publish the amended consultation
+Then I can see that the consultation has been published
+Feature: Grouping documents into a collection
+As an organisation,
+I want to present regularly published documents as collection
+So that my users can more easily find earlier publications of the same type
+Background:
+Given I am a writer in the organisation "Government Department"
+@javascript
+Scenario: Admin creates a document collection.
+Given a published document "Wombats of Wimbledon" exists
+When I draft a new document collection called "Wildlife of Wimbledon Common"
+And I add the document "Wombats of Wimbledon" to the document collection
+Then I can see in the admin that "Wombats of Wimbledon" is part of the document collection
+@javascript
+Scenario: Removing documents from a collection
+Given a published publication called "May 2012 Update" in a published document collection
+When I redraft the document collection and remove "May 2012 Update" from it
+Then I can see in the admin that "May 2012 Update" does not appear
+@javascript
+Scenario: Reordering documents in a document collection
+Given a published document "Wombats of Wimbledon" exists
+And a published document "Feeding Wombats" exists
+And a published document "The nocturnal habits of Wombats" exists
+When I draft a new document collection called "Wildlife of Wimbledon Common"
+And I add the document "Wombats of Wimbledon" to the document collection
+And I add the document "Feeding Wombats" to the document collection
+And I add the document "The nocturnal habits of Wombats" to the document collection
+And I move "Feeding Wombats" before "Wombats of Wimbledon" in the document collection
+Then I can view the document collection in the admin
+And I see that "Feeding Wombats" is before "Wombats of Wimbledon" in the document collection
+And I see that "Wombats of Wimbledon" is before "The nocturnal habits of Wombats" in the document collection
+Feature: Creating and publishing topical events
+As an editor
+I want to be able to create and publish topical events
+So that I can communicate about them
+Background:
+Given I am an editor
+Scenario: Associating a consultation with a topical event
+Given a topical event called "An Event" with description "A topical event"
+When I draft a new consultation "A Consultation" relating it to topical event "An Event"
+And I force publish the consultation "A Consultation"
+Then I should see the consultation "A Consultation" in the consultations section of the topical event "An Event"
+Feature: Providing translated content from gov.uk/government
+As someone interested in the foreign activities of the UK government who is not a native english speaker
+I want to be able to read information about the UK government in my own language
+So that I can better understand it's relationship to the locales that I am interested in
+Scenario: Maintaining locale between pages
+Given a worldwide organisation that is translated exists
+Given I visit the world organisation that is translated
+Then I should see the translation of that world organisation
+Feature: Administering worldwide organisation
+As a citizen interested in UK gov activity around the world, I want there to
+be profiles of the world organisation (eg embassies, DFID offices, UKTI
+branches) in each worldwide location, so I can see which organisation are
+active in each location and read more about them.
+Acceptance criteria:
+* Each world organisation has:
+* a unique name e.g. "British Embassy in Madrid" and a URL "/world/offices/british-embassy-in-madrid" which is generated from the name
+* multiple social media links (like orgs)
+* multiple sets of office information (like orgs)
+* with the addition of a list of services (chosen from a set) that the office provides
+* a logo formatted name (always using the standard HMG crest for now)
+* Each world organisation can be associated with 1+ world locations, and shows on the world locations page to which they are associated (see mock up on the [ticket](https://www.pivotaltracker.com/story/show/41026113))
+* Each can have corporate information pages (like orgs)
+Background:
+Given I am a GDS editor
+And a world location "United Kingdom" exists
+Scenario: Adding a new translation
+Given a worldwide organisation "Department of Beards in France" exists for the world location "France" with translations into "Français"
+When I add a new translation to the worldwide organisation "Department of Beards in France" with:
+| locale      | Français                                          |
+| name        | Département des barbes en France                  |
+Then when viewing the worldwide organisation "Department of Beards in France" with the locale "fr" I should see:
+| name        | Département des barbes en France                  |
+Scenario: Editing an existing translation
+Given a worldwide organisation "Department of Beards in France" exists with a translation for the locale "Français"
+When I edit the "Français" translation for the worldwide organisation "Department of Beards in France" setting:
+| name        | Le super département des barbes en France         |
+Then when viewing the worldwide organisation "Department of Beards in France" with the locale "fr" I should see:
+| name        | Le super département des barbes en France         |

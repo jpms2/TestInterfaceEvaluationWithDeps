@@ -1,0 +1,2 @@
+[path:\features\step_definitions\lesson_steps.rb, methods:[4, 8, 12]]
+[path:\features\step_definitions\navigation_steps.rb, methods:[0, 5, 10, 22, 16]]

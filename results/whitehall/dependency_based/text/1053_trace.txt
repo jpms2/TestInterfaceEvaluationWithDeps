@@ -1,0 +1,4 @@
+[path:\features\step_definitions\document_steps.rb, methods:[175]]
+[path:\features\step_definitions\session_steps.rb, methods:[0]]
+[path:\features\step_definitions\world_location_steps.rb, methods:[15, 48]]
+[path:\features\support\gds_sso_helper.rb, methods:[[name:login_as, step:Given ]]]

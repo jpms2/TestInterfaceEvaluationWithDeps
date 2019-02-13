@@ -1,0 +1,38 @@
+Classes: 3
+[name:Course, file:TheOdinProject_theodinproject\app\models\course.rb, step:Given ]
+[name:FactoryGirl, file:null, step:Given ]
+[name:Section, file:TheOdinProject_theodinproject\app\models\section.rb, step:Given ]
+
+Methods: 17
+[name:click_button, type:Object, file:null, step:When ]
+[name:click_link, type:Object, file:null, step:When ]
+[name:contributing, type:StaticPagesController, file:TheOdinProject_theodinproject\app\controllers\static_pages_controller.rb, step:null]
+[name:current_email, type:Object, file:null, step:Then ]
+[name:current_email, type:Object, file:null, step:When ]
+[name:each, type:Object, file:null, step:Given ]
+[name:fill_in, type:Object, file:null, step:When ]
+[name:find_by, type:Section, file:TheOdinProject_theodinproject\app\models\section.rb, step:Given ]
+[name:hashes, type:Object, file:null, step:Given ]
+[name:have_content, type:Object, file:null, step:Then ]
+[name:have_link, type:Object, file:null, step:Then ]
+[name:home, type:StaticPagesController, file:TheOdinProject_theodinproject\app\controllers\static_pages_controller.rb, step:null]
+[name:index, type:CoursesController, file:TheOdinProject_theodinproject\app\controllers\courses_controller.rb, step:null]
+[name:open_email, type:Object, file:null, step:Then ]
+[name:page, type:Object, file:null, step:Then ]
+[name:show, type:CoursesController, file:TheOdinProject_theodinproject\app\controllers\courses_controller.rb, step:null]
+[name:to, type:Object, file:null, step:Then ]
+
+Referenced pages: 12
+TheOdinProject_theodinproject\app\views\courses\index.html.erb
+TheOdinProject_theodinproject\app\views\courses\show.html.erb
+TheOdinProject_theodinproject\app\views\devise\confirmations\new.html.erb
+TheOdinProject_theodinproject\app\views\devise\sessions\new.html.erb
+TheOdinProject_theodinproject\app\views\devise\shared\_links.erb
+TheOdinProject_theodinproject\app\views\shared\_completion_percent.html.erb
+TheOdinProject_theodinproject\app\views\shared\_github_login_button.html.erb
+TheOdinProject_theodinproject\app\views\shared\_lc_index.html.erb
+TheOdinProject_theodinproject\app\views\shared\_logo_text.html.erb
+TheOdinProject_theodinproject\app\views\shared\_social.html.erb
+TheOdinProject_theodinproject\app\views\static_pages\contributing.html.erb
+TheOdinProject_theodinproject\app\views\static_pages\home.html.erb
+

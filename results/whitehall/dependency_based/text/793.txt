@@ -1,0 +1,37 @@
+Feature: Consultations
+@not-quite-as-fake-search
+Scenario: Publishing a submitted consultation
+Given I am an editor
+And a submitted consultation "Beard Length Review" exists
+When I publish the consultation "Beard Length Review"
+Then I should see the consultation "Beard Length Review" in the list of published documents
+And the consultation "Beard Length Review" should be visible to the public
+Scenario: Viewing an unopened consultation
+Given I am an editor
+And an unopened consultation exists
+When I visit the consultation
+Then the date the consultation opens should be viewable
+Scenario: Adding an outcome to a closed consultation
+Given I am an editor
+And a closed consultation exists
+When I add an outcome to the consultation
+And I save and publish the amended consultation
+Then the consultation outcome should be viewable
+Scenario: Adding public feedback to a closed consultation
+Given I am an editor
+And a closed consultation exists
+When I add public feedback to the consultation
+And I save and publish the amended consultation
+Then the public feedback should be viewable
+Feature: Creating and publishing topical events
+As an editor
+I want to be able to create and publish topical events
+So that I can communicate about them
+Background:
+Given I am an editor
+Scenario: Associating a consultation with a topical event
+Given a topical event called "An Event" with description "A topical event"
+When I draft a new consultation "A Consultation" relating it to topical event "An Event"
+And I force publish the consultation "A Consultation"
+Then I should see the consultation "A Consultation" in the consultations section of the topical event "An Event"
+And the consultation "A Consultation" shows it is related to the topical event "An Event" on its public page

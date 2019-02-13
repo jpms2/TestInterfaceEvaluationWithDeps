@@ -1,0 +1,295 @@
+Given /^I am (?:a|an) (writer|editor|admin|GDS editor|GDS admin|importer|managing editor)(?: called "([^"]*)")?$/ do |role, name|
+  @user = case role
+  when "writer"
+    create(:writer, name: (name || "Wally Writer"))
+  when "editor"
+    create(:departmental_editor, name: (name || "Eddie Depteditor"))
+  when "admin"
+    create(:user)
+  when "GDS editor"
+    create(:gds_editor)
+  when "GDS admin"
+    create(:gds_admin)
+  when 'importer'
+    create(:importer)
+  when 'managing editor'
+    create(:managing_editor)
+  end
+  login_as @user
+end
+  def login_as(user)
+    GDS::SSO.test_user = user
+    Edition::AuditTrail.whodunnit = user
+    super(user) # warden
+  end
+Given /^a submitted (publication|news article|consultation|speech|detailed guide) "([^"]*)" exists$/ do |document_type, title|
+  create("submitted_#{document_class(document_type).name.underscore}".to_sym, title: title)
+end
+When /^I publish (#{THE_DOCUMENT})$/ do |edition|
+  visit_edition_admin edition.title
+  publish
+end
+When /^I force publish (#{THE_DOCUMENT})$/ do |edition|
+  visit_edition_admin edition.title, :draft
+  click_link "Edit draft"
+  fill_in_change_note_if_required
+  click_button "Save"
+  publish(force: true)
+end
+Then /^I should see (#{THE_DOCUMENT})$/ do |edition|
+  assert has_css?(record_css_selector(edition))
+end
+Then /^(#{THE_DOCUMENT}) should be visible to the public$/ do |edition|
+  visit_public_index_for(edition)
+  assert page.has_css?(record_css_selector(edition), text: edition.title)
+end
+  def document_class(type)
+    type = 'edition' if type == 'document'
+    type.gsub(" ", "_").classify.constantize
+  end
+  def visit_edition_admin(title, scope = :all)
+    document = Edition.send(scope).find_by(title: title)
+    visit admin_edition_path(document)
+  end
+  def fill_in_change_note_if_required
+    if has_css?("textarea[name='edition[change_note]']", wait: false)
+      fill_in "edition_change_note", with: "changes"
+    end
+  end
+  def publish(options = {})
+    if options[:force]
+      click_link "Force publish"
+      page.has_css?(".force-publish-form", visible: true)
+      within '.force-publish-form' do
+        fill_in 'reason', with: "because"
+        click_button 'Force publish'
+      end
+      unless options[:ignore_errors]
+        refute_flash_alerts_exist
+      end
+    else
+      click_button "Publish"
+      unless options[:ignore_errors]
+        refute_flash_alerts_exist
+      end
+    end
+  end
+  def visit_public_index_for(edition)
+    case edition
+    when Publication
+      visit publications_path
+    when NewsArticle, Speech
+      visit announcements_path
+    when Consultation
+      visit consultations_path
+    when DetailedGuide
+      visit detailed_guide_path(edition.document)
+    else
+      raise "Don't know where to go for #{edition.class.name}s"
+    end
+  end
+  def refute_flash_alerts_exist
+    assert has_no_css?(".flash.alert")
+  end
+  def admin_edition_path(edition, *args)
+    polymorphic_path([:admin, edition], *args)
+  end
+Given(/^a closed consultation exists$/) do
+  create(:closed_consultation)
+end
+Given(/^an unopened consultation exists$/) do
+  create(:unopened_consultation)
+end
+When /^I visit the consultation$/ do
+  consultation = Consultation.find_by!(title: 'consultation-title')
+  visit consultation_path(consultation.document)
+end
+When /^I add an outcome to the consultation$/ do
+  visit edit_admin_consultation_path(Consultation.last)
+  click_button "Create new edition"
+
+  click_link "Final outcome"
+  fill_in "Detail/Summary", with: "Outcome summary"
+  click_button "Save"
+
+  upload_new_attachment(pdf_attachment, "Outcome attachment title")
+end
+When(/^I add public feedback to the consultation$/) do
+  visit edit_admin_consultation_path(Consultation.last)
+  click_button "Create new edition"
+
+  click_link "Public feedback"
+  fill_in "Summary", with: "Feedback summary"
+  click_button "Save"
+
+  upload_new_attachment(pdf_attachment, "Feedback attachment title")
+end
+When /^I save and publish the amended consultation$/ do
+  ensure_path edit_admin_consultation_path(Consultation.last)
+  fill_in_change_note_if_required
+  click_button "Save"
+  publish force: true
+end
+Then /^the consultation outcome should be viewable$/ do
+  select_most_recent_consultation_from_list
+  view_visible_consultation_on_website
+
+  outcome = ConsultationOutcome.last
+  within(record_css_selector(outcome)) do
+    assert has_content?('Outcome summary')
+    assert has_content?('Outcome attachment title')
+  end
+end
+Then /^the date the consultation opens should be viewable$/ do
+  assert has_content?('This consultation opens on')
+  assert has_content?('It closes on')
+  refute has_content?('Original consultation')
+end
+Then(/^the public feedback should be viewable$/) do
+  select_most_recent_consultation_from_list
+  view_visible_consultation_on_website
+
+  feedback = ConsultationPublicFeedback.last
+  within(record_css_selector(feedback)) do
+    assert has_content?('Feedback summary')
+    assert has_content?('Feedback attachment title')
+  end
+end
+  def pdf_attachment
+    Rails.root.join('features/fixtures/attachment.pdf')
+  end
+  def fill_in_change_note_if_required
+    if has_css?("textarea[name='edition[change_note]']", wait: false)
+      fill_in "edition_change_note", with: "changes"
+    end
+  end
+  def publish(options = {})
+    if options[:force]
+      click_link "Force publish"
+      page.has_css?(".force-publish-form", visible: true)
+      within '.force-publish-form' do
+        fill_in 'reason', with: "because"
+        click_button 'Force publish'
+      end
+      unless options[:ignore_errors]
+        refute_flash_alerts_exist
+      end
+    else
+      click_button "Publish"
+      unless options[:ignore_errors]
+        refute_flash_alerts_exist
+      end
+    end
+  end
+  def upload_new_attachment(file_path, attachment_title)
+    click_link "Upload new file attachment"
+    fill_in "Title", with: attachment_title
+    attach_file "File", file_path
+    click_button "Save"
+    Attachment.find_by(title: attachment_title)
+  end
+  def select_most_recent_consultation_from_list
+    click_link(Consultation.last.title)
+  end
+  def view_visible_consultation_on_website
+    click_link("View on website")
+  end
+Given(/^a topical event called "(.*?)" with description "(.*?)"$/) do |name, description|
+  @topical_event = create(:topical_event, name: name, description: description)
+end
+When /^I draft a new consultation "([^"]*)" relating it to topical event "([^"]*)"$/ do |consultation_title, topical_event_name|
+  begin_drafting_consultation title: consultation_title
+  select topical_event_name, from: "Topical events"
+  click_button "Save"
+end
+Then /^(#{THE_DOCUMENT}) shows it is related to the topical event "([^"]*)" on its public page$/ do |edition, topical_event_name|
+  topical_event = TopicalEvent.find_by!(name: topical_event_name)
+  visit public_document_path(edition)
+  assert page.has_css?(".meta a", text: topical_event.name)
+end
+  def begin_drafting_consultation(options)
+    begin_drafting_document(options.merge(type: "consultation"))
+    select_date 10.days.from_now.to_s, from: "Opening Date"
+    select_date 40.days.from_now.to_s, from: "Closing Date"
+  end
+  def select(value, options = {})
+    if options.has_key?(:from)
+      element = find(:select, options[:from], visible: :all).find(:option, value, visible: :all)
+      if element.visible?
+        from = options.delete(:from)
+        find(:select, from, options).find(:option, value, options).select_option
+      else
+        select_from_chosen(value, options)
+      end
+    else
+      find(:option, value, options).select_option
+    end
+  end
+  def begin_drafting_document(options)
+    if Organisation.count == 0
+      create(:organisation)
+    end
+    if Topic.count == 0
+      create(:topic)
+    end
+    visit admin_root_path
+    # Make sure the dropdown is visible first, otherwise Capybara won't see the links
+    find('li.create-new a', text: 'New document').click
+    within 'li.create-new' do
+      click_link options[:type].humanize
+    end
+
+    within 'form' do
+      fill_in "edition_title", with: options[:title]
+      fill_in "edition_body", with: options.fetch(:body, "Any old iron")
+      fill_in "edition_summary", with: options.fetch(:summary, 'one plus one euals two!')
+      fill_in_change_note_if_required
+      select_topic_if_required unless options[:skip_topic_selection]
+
+      unless options[:type] == 'world_location_news_article'
+        set_lead_organisation_on_document(Organisation.first)
+      end
+
+      if options[:alternative_format_provider]
+        select options[:alternative_format_provider].name, from: "edition_alternative_format_provider_id"
+      end
+
+      case options[:previously_published]
+      when false
+        choose 'has never been published before. It is new.'
+      when true
+        choose 'has previously been published on another website.'
+      end
+
+    end
+  end
+  def select_from_chosen(value, options = {})
+    field = find_field(options[:from], visible: false, match: :first)
+    option_value = page.evaluate_script("$(\"##{field[:id]} option:contains('#{value}')\").val()")
+
+    if field[:multiple]
+      page.execute_script("value = ['#{option_value}']\; if ($('##{field[:id]}').val()) {$.merge(value, $('##{field[:id]}').val())}")
+      option_value = page.evaluate_script("value")
+    end
+
+    page.execute_script("$('##{field[:id]}').val(#{option_value.to_json})")
+    page.execute_script("$('##{field[:id]}').trigger('liszt:updated').trigger('change')")
+  end
+  def set_lead_organisation_on_document(organisation, order = 1)
+    select organisation.name, from: "edition_lead_organisation_ids_#{order}"
+  end
+  def fill_in_change_note_if_required
+    if has_css?("textarea[name='edition[change_note]']", wait: false)
+      fill_in "edition_change_note", with: "changes"
+    end
+  end
+  def select_topic_if_required
+    if has_css?(".edition-topic-fields", wait: false)
+      within(".edition-topic-fields") do
+        select Topic.first.name, from: "Policy Areas"
+      end
+    end
+  end
+  def public_document_path(edition, options = {})
+    document_path(edition, options)
+  end

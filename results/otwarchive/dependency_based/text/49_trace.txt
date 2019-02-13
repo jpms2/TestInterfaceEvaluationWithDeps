@@ -1,0 +1,8 @@
+[path:\features\step_definitions\admin_steps.rb, methods:[40, 94, 180, 53]]
+[path:\features\step_definitions\collection_steps.rb, methods:[42, 88]]
+[path:\features\step_definitions\generic_steps.rb, methods:[192, 187]]
+[path:\features\step_definitions\pickle_steps.rb, methods:[3, 38]]
+[path:\features\step_definitions\tag_steps.rb, methods:[90, 175, 165, 188, 82, 170, 7, 180, 37]]
+[path:\features\step_definitions\user_steps.rb, methods:[77, 69, 45, 117, 30]]
+[path:\features\step_definitions\web_steps.rb, methods:[49, 55, 43, 129, 116, 181, 31, 39, 86, 92, 104, 98, [name:with_scope, step:When ], [name:with_scope, step:Then ], [name:with_scope, step:Given ]]]
+[path:\features\step_definitions\work_steps.rb, methods:[58, 170, 192, 35, 11, 251]]

@@ -1,0 +1,99 @@
+Classes: 10
+[name:Edition, file:alphagov_whitehall\app\models\edition.rb, step:Given ]
+[name:Edition, file:alphagov_whitehall\app\presenters\publishing_api_presenters\edition.rb, step:Given ]
+[name:FactoryGirl, file:alphagov_whitehall\features\support\factory_girl.rb, step:Given ]
+[name:GDS, file:null, step:Given ]
+[name:Organisation, file:alphagov_whitehall\app\models\organisation.rb, step:Given ]
+[name:Organisation, file:alphagov_whitehall\app\models\organisation.rb, step:Then ]
+[name:Organisation, file:alphagov_whitehall\app\models\organisation.rb, step:When ]
+[name:Policy, file:alphagov_whitehall\app\models\policy.rb, step:When ]
+[name:THE_DOCUMENT, file:null, step:Then ]
+[name:User, file:alphagov_whitehall\app\models\user.rb, step:Given ]
+
+Methods: 61
+[name:check_for_government, type:Object, file:null, step:Then ]
+[name:check_no_featured_policies, type:OrganisationHelper, file:alphagov_whitehall\features\support\organisation_helper.rb, step:Then ]
+[name:click_button, type:Object, file:null, step:When ]
+[name:click_link, type:Object, file:null, step:When ]
+[name:content_register_has_policies, type:Object, file:null, step:Given ]
+[name:create, type:Object, file:null, step:Given ]
+[name:create, type:SpeechType, file:alphagov_whitehall\app\models\speech_type.rb, step:Given ]
+[name:create, type:FactoryGirl, file:alphagov_whitehall\features\support\factory_girl.rb, step:Given ]
+[name:create_government, type:Object, file:null, step:When ]
+[name:css_classes, type:PromotionalFeature, file:alphagov_whitehall\app\models\promotional_feature.rb, step:When ]
+[name:each, type:Object, file:null, step:When ]
+[name:each_with_index, type:Object, file:null, step:When ]
+[name:edit, type:Admin\organisationsController, file:alphagov_whitehall\app\controllers\admin\organisations_controller.rb, step:When ]
+[name:edit_government, type:Object, file:null, step:When ]
+[name:feature_policies_on_organisation, type:OrganisationHelper, file:alphagov_whitehall\features\support\organisation_helper.rb, step:When ]
+[name:fill_in, type:Object, file:null, step:When ]
+[name:find_by, type:Organisation, file:alphagov_whitehall\app\models\organisation.rb, step:Given ]
+[name:find_by!, type:Organisation, file:alphagov_whitehall\app\models\organisation.rb, step:Then ]
+[name:find_by!, type:Organisation, file:alphagov_whitehall\app\models\organisation.rb, step:When ]
+[name:gsub, type:Object, file:null, step:Given ]
+[name:has_css?, type:Object, file:null, step:Then ]
+[name:id, type:AttachmentVisibility, file:alphagov_whitehall\app\models\attachment_visibility.rb, step:When ]
+[name:id, type:FeaturePresenter, file:alphagov_whitehall\app\presenters\feature_presenter.rb, step:When ]
+[name:index, type:CorporateInformationPagesController, file:alphagov_whitehall\app\controllers\admin\corporate_information_pages_controller.rb, step:When ]
+[name:index, type:CorporateInformationPagesController, file:alphagov_whitehall\app\controllers\corporate_information_pages_controller.rb, step:When ]
+[name:items, type:HomePageList, file:alphagov_whitehall\app\models\home_page_list.rb, step:When ]
+[name:items, type:PromotionalFeature, file:alphagov_whitehall\app\models\promotional_feature.rb, step:When ]
+[name:login_as, type:GdsSsoHelper, file:alphagov_whitehall\features\support\gds_sso_helper.rb, step:Given ]
+[name:order_features_from, type:FeatureOrderHelper, file:alphagov_whitehall\features\support\feature_order_helper.rb, step:When ]
+[name:page, type:StatisticsAnnouncementsFilter, file:alphagov_whitehall\app\models\frontend\statistics_announcements_filter.rb, step:Then ]
+[name:page, type:Paginator, file:alphagov_whitehall\app\presenters\api\paginator.rb, step:Then ]
+[name:policies_finder_path, type:ApplicationHelper, file:alphagov_whitehall\app\helpers\application_helper.rb, step:When ]
+[name:promotional_feature_items, type:PromotionalFeature, file:alphagov_whitehall\app\models\promotional_feature.rb, step:When ]
+[name:public_document_path, type:PublicDocumentRoutesHelper, file:alphagov_whitehall\app\helpers\public_document_routes_helper.rb, step:When ]
+[name:public_document_url, type:PublicDocumentRoutesHelper, file:alphagov_whitehall\app\helpers\public_document_routes_helper.rb, step:When ]
+[name:public_document_url, type:AuthorNotifier, file:alphagov_whitehall\app\services\service_listeners\author_notifier.rb, step:When ]
+[name:raw, type:Object, file:null, step:When ]
+[name:record_css_selector, type:Object, file:null, step:Then ]
+[name:refute, type:Object, file:null, step:Then ]
+[name:show, type:Admin\organisationsController, file:alphagov_whitehall\app\controllers\admin\organisations_controller.rb, step:When ]
+[name:show, type:OrganisationsController, file:alphagov_whitehall\app\controllers\admin\organisations_controller.rb, step:When ]
+[name:show, type:OrganisationsController, file:alphagov_whitehall\app\controllers\api\organisations_controller.rb, step:When ]
+[name:show, type:OrganisationsController, file:alphagov_whitehall\app\controllers\organisations_controller.rb, step:When ]
+[name:show, type:CorporateInformationPagesController, file:alphagov_whitehall\app\controllers\admin\corporate_information_pages_controller.rb, step:When ]
+[name:show, type:CorporateInformationPagesController, file:alphagov_whitehall\app\controllers\corporate_information_pages_controller.rb, step:When ]
+[name:text, type:Object, file:null, step:When ]
+[name:title, type:PromotionalFeature, file:alphagov_whitehall\app\models\promotional_feature.rb, step:When ]
+[name:title, type:EditionFilter, file:alphagov_whitehall\app\models\admin\edition_filter.rb, step:When ]
+[name:title, type:StatisticsAnnouncementFilter, file:alphagov_whitehall\app\models\admin\statistics_announcement_filter.rb, step:When ]
+[name:title, type:ClassificationFeaturing, file:alphagov_whitehall\app\models\classification_featuring.rb, step:When ]
+[name:title, type:CorporateInformationPage, file:alphagov_whitehall\app\models\corporate_information_page.rb, step:When ]
+[name:title, type:FeaturedPolicy, file:alphagov_whitehall\app\models\featured_policy.rb, step:When ]
+[name:title, type:RegisterableEdition, file:alphagov_whitehall\app\models\registerable_edition.rb, step:When ]
+[name:title, type:EmailSignupInformationPresenter, file:alphagov_whitehall\app\presenters\email_signup_information_presenter.rb, step:When ]
+[name:title, type:FeaturePresenter, file:alphagov_whitehall\app\presenters\feature_presenter.rb, step:When ]
+[name:title, type:PromotionalFeatureItemPresenter, file:alphagov_whitehall\app\presenters\promotional_feature_item_presenter.rb, step:When ]
+[name:title, type:Row, file:alphagov_whitehall\lib\whitehall\uploader\row.rb, step:When ]
+[name:to_sym, type:Object, file:null, step:Given ]
+[name:unfeature_organisation_policy, type:OrganisationHelper, file:alphagov_whitehall\features\support\organisation_helper.rb, step:When ]
+[name:visit_organisation, type:Paths, file:alphagov_whitehall\features\support\paths.rb, step:Then ]
+[name:visit_organisation_featured_policies_admin, type:Paths, file:alphagov_whitehall\features\support\paths.rb, step:When ]
+
+Referenced pages: 22
+alphagov_whitehall\app\views\admin\organisations\_form.html.erb
+alphagov_whitehall\app\views\admin\organisations\_sidebar.html.erb
+alphagov_whitehall\app\views\admin\organisations\edit.html.erb
+alphagov_whitehall\app\views\admin\organisations\show.html.erb
+alphagov_whitehall\app\views\contacts\_contact.html.erb
+alphagov_whitehall\app\views\corporate_information_pages\index.html.erb
+alphagov_whitehall\app\views\corporate_information_pages\show.html.erb
+alphagov_whitehall\app\views\corporate_information_pages\show_worldwide_organisation.html.erb
+alphagov_whitehall\app\views\mainstream_categories\_list_description.html.erb
+alphagov_whitehall\app\views\organisations\_corporate_information.html.erb
+alphagov_whitehall\app\views\organisations\_documents.html.erb
+alphagov_whitehall\app\views\organisations\_featured_items.html.erb
+alphagov_whitehall\app\views\organisations\_header.html.erb
+alphagov_whitehall\app\views\organisations\_promotional_feature_item.html.erb
+alphagov_whitehall\app\views\organisations\show-promotional.html.erb
+alphagov_whitehall\app\views\organisations\show.html.erb
+alphagov_whitehall\app\views\people\_person.html.erb
+alphagov_whitehall\app\views\policies\_document_list.html.erb
+alphagov_whitehall\app\views\shared\_available_languages.html.erb
+alphagov_whitehall\app\views\shared\_govspeak_header_contents.html.erb
+alphagov_whitehall\app\views\shared\_social_media_accounts.html.erb
+alphagov_whitehall\app\views\worldwide_organisations\_header.html.erb
+

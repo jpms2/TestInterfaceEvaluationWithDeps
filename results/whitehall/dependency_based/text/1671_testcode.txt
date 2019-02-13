@@ -1,0 +1,110 @@
+Given /^I am (?:a|an) (writer|editor|admin|GDS editor|GDS admin|importer|managing editor)(?: called "([^"]*)")?$/ do |role, name|
+  @user = case role
+  when "writer"
+    create(:writer, name: (name || "Wally Writer"))
+  when "editor"
+    create(:departmental_editor, name: (name || "Eddie Depteditor"))
+  when "admin"
+    create(:user)
+  when "GDS editor"
+    create(:gds_editor)
+  when "GDS admin"
+    create(:gds_admin)
+  when 'importer'
+    create(:importer)
+  when 'managing editor'
+    create(:managing_editor)
+  end
+  login_as @user
+end
+Given /^I am (?:an?) (admin|writer|editor|GDS editor) in the organisation "([^"]*)"$/ do |role, organisation_name|
+  organisation = Organisation.find_by(name: organisation_name) || create(:ministerial_department, name: organisation_name)
+  @user = case role
+  when "admin"
+    create(:user, organisation: organisation)
+  when "writer"
+    create(:writer, name: "Wally Writer", organisation: organisation)
+  when "editor"
+    create(:departmental_editor, name: "Eddie Depteditor", organisation: organisation)
+  when "GDS editor"
+    create(:gds_editor, organisation: organisation)
+  end
+  login_as @user
+end
+  def login_as(user)
+    GDS::SSO.test_user = user
+    Edition::AuditTrail.whodunnit = user
+    super(user) # warden
+  end
+When(/^I create a government called "(.*?)" starting on "(.*?)"$/) do |government_name, start_date|
+  create_government(name: government_name, start_date: start_date)
+end
+Then(/^there should be a government called "(.*?)" starting on "(.*?)"$/) do |government_name, start_date|
+  check_for_government(name: government_name, start_date: start_date)
+end
+Then(/^there should be a government called "(.*?)" between dates "(.*?)" and "(.*?)"$/) do |government_name, start_date, end_date|
+  check_for_government(name: government_name, start_date: start_date, end_date: end_date)
+end
+Given(/^a government exists called "(.*?)" between dates "(.*?)" and "(.*?)"$/) do |government_name, start_date, end_date|
+  FactoryGirl.create(:government, name: government_name, start_date: start_date, end_date: end_date)
+end
+When(/^I edit the government called "(.*?)" to have dates "(.*?)" and "(.*?)"$/) do |government_name, start_date, end_date|
+  edit_government(name: government_name, attributes: {
+    start_date: start_date,
+    end_date: end_date
+  })
+end
+Given /^and the policies "(.*?)" and "(.*?)" exist$/ do |policy_name_1, policy_name_2|
+  content_register_has_policies([policy_name_1, policy_name_2])
+end
+When /^I feature the policies "(.*?)" and "(.*?)" for "(.*?)"$/ do |policy_name_1, policy_name_2, organisation_name|
+  visit_organisation_featured_policies_admin organisation_name
+  feature_policies_on_organisation [policy_name_1, policy_name_2]
+end
+When(/^I stop featuring the polices "(.*?)" for "(.*?)"$/) do |policy_name, organisation_name|
+  visit_organisation_featured_policies_admin organisation_name
+  unfeature_organisation_policy(policy_name)
+end
+Then(/^there should be no featured policies on the home page of "(.*?)"$/) do |organisation_name|
+  visit_organisation organisation_name
+  check_no_featured_policies
+end
+When(/^I order the featured policies in the "(.*?)" organisation as:$/) do |organisation_name, table|
+  visit_organisation_featured_policies_admin organisation_name
+  order_features_from(table)
+end
+  def visit_organisation(name)
+    organisation = Organisation.find_by!(name: name)
+    visit organisation_path(organisation)
+  end
+  def visit_organisation_featured_policies_admin(name)
+    organisation = Organisation.find_by!(name: name)
+    visit admin_organisation_path(organisation)
+    click_link "Featured policies"
+  end
+  def feature_policies_on_organisation(policies)
+    policies.each do |policy|
+      click_button "Feature #{policy}"
+    end
+  end
+  def unfeature_organisation_policy(policy)
+    click_link "Unfeature #{policy}"
+  end
+  def check_no_featured_policies
+    refute page.has_css?("#policies")
+  end
+  def order_features_from(table)
+    table.raw.each_with_index do |(title), index|
+      fill_in title, with: index
+    end
+    click_button "Save ordering"
+  end
+  def organisation_path(organisation_or_court_or_slug, options = {})
+    organisation_url(organisation_or_court_or_slug, options.merge(only_path: true))
+  end
+Then /^I should see (#{THE_DOCUMENT})$/ do |edition|
+  assert has_css?(record_css_selector(edition))
+end
+Given /^an? (world location|international delegation) "([^"]*)" exists$/ do |world_location_type, name|
+  create(world_location_type.gsub(' ', '_').to_sym, name: name)
+end

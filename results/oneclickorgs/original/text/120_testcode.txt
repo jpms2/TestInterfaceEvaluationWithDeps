@@ -1,0 +1,240 @@
+Given /^I have logged in$/ do
+  user_logs_in
+end
+When /^I log in$/ do
+  user_logs_in
+end
+def user_logs_in
+  visit '/'
+  fill_in('Email', :with => @user.email)
+  fill_in('Password', :with => @user.password)
+  click_button("Login")
+end
+When /^(?:|I )go to (.+)$/ do |page_name|
+  visit path_to(page_name)
+end
+When /^(?:|I )press "([^"]*)"$/ do |button|
+  click_button(button)
+end
+When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
+  fill_in(field, :with => value)
+end
+When /^(?:|I )choose "([^"]*)"$/ do |field|
+  choose(field)
+end
+Then /^(?:|I )should see "([^"]*)"$/ do |text|
+  if page.respond_to? :should
+    page.should have_content(text)
+  else
+    assert page.has_content?(text)
+  end
+end
+Then /^(?:|I )should be on (.+)$/ do |page_name|
+  current_path = URI.parse(current_url).path
+  if current_path.respond_to? :should
+    current_path.should == path_to(page_name)
+  else
+    assert_equal path_to(page_name), current_path
+  end
+end
+  def path_to(page_name)
+    case page_name
+
+    when /^the home\s?page$/
+      '/'
+    when /^the setup page$/
+      '/setup'
+    when /^the signup page$/
+      '/organisations/new'
+    when /^the welcome page$/
+      '/welcome'
+    when /^the voting and proposals page$/
+      '/'
+    when /^my member page$/
+      member_path(@user)
+    when /^my account page$/
+      edit_member_path(@user)
+    when /^the proposal page$/
+      @proposal ||= Proposal.last
+      proposal_path(@proposal)
+    when /^the member page for "(.*)"$/
+      @member = @organisation.members.find_by_email($1)
+      member_path(@member)
+    when /^a member's page$/
+      @member = @organisation.members.active.last
+      member_path(@member)
+    when /^the members page$/
+      members_path
+    when /^the dashboard$/
+      '/'
+
+    # Add more mappings here.
+    # Here is an example that pulls values out of the Regexp:
+    #
+    #   when /^(.*)'s profile page$/i
+    #     user_profile_path(User.find_by_login($1))
+
+    else
+      begin
+        page_name =~ /the (.*) page/
+        path_components = $1.split(/\s+/)
+        self.send(path_components.push('path').join('_').to_sym)
+      rescue Object => e
+        raise "Can't find mapping from \"#{page_name}\" to a path.\n" +
+          "Now, go and add a mapping in #{__FILE__}"
+      end
+    end
+  end
+Then /^I should see a list of the members who voted in favour of the founding$/ do
+  @fop ||= @organisation.found_organisation_proposals.last
+  
+  for_members = @fop.votes.where(:for => true).map{|v| v.member}
+  
+  for_members.each do |m|
+    page.should have_content(m.name)
+  end
+end
+Then /^I should not see the member who voted against the founding$/ do
+  @fop ||= @organisation.found_organisation_proposals.last
+  
+  against_members = @fop.votes.where(:for => false).map{|v| v.member}
+  
+  against_members.each do |m|
+    page.should_not have_content(m.name)
+  end
+end
+Given /^the application is set up$/ do
+  # *.ocolocalhost.com resolves to 127.0.0.1. This lets us test subdomain
+  # look-up using domains like 'company.ocolocalhost.com' and
+  # 'association.ocolocalhost.com', without having to set up local wildcard
+  # entries on each developer's machine and on the CI server.
+  # 
+  # N.B. This means some Cucumber scenarios will fail if your machine
+  # isn't connected to the internet. We should probably fix this.
+  # 
+  # Port needs to be saved for Selenium tests (because our app code considers
+  # the port as well as the hostname when figuring out how to handle a
+  # request, and the Capybara app server doesn't run on port 80).
+  # 
+  # When using the rack-test driver, don't use port numbers at all,
+  # since it makes our test-session-resetting code (see features/support/capybara_domains.rb)
+  # more complicated.
+  port_segment = Capybara.current_driver == :selenium ? ":#{Capybara.server_port}" : ''
+  
+  Setting[:base_domain] = "ocolocalhost.com#{port_segment}"
+  Setting[:signup_domain] = "create.ocolocalhost.com#{port_segment}"
+end
+Given /^I have created an organisation$/ do
+  step "an organisation has been created"
+  @user = @founder
+  step "the subdomain is the organisation's subdomain"
+  step "I have logged in"
+end
+Given /^an organisation has been created$/ do
+  @organisation = Organisation.make
+  @organisation.pending!
+  @founder = @organisation.members.make(
+    :member_class => @organisation.member_classes.find_by_name("Founder"),
+    :inducted_at => nil
+  )
+end
+Given /^the subdomain is the organisation's subdomain$/ do
+  step %Q{the subdomain is "#{@organisation.subdomain}"}
+end
+Given /^there are enough members to start the founding vote$/ do
+  extra_members_needed = 3 - @organisation.members.count
+  if extra_members_needed > 0
+    # Add one extra so we can test what happens when someone abstains or
+    # votes against the founding.
+    (extra_members_needed + 1).times do
+      @organisation.members.make(:pending,
+        :member_class => @organisation.member_classes.find_by_name("Founding Member")
+      )
+    end
+  end
+end
+Given /^the founding vote has been started$/ do
+  founder = @organisation.member_classes.where(:name => "Founder").first.members.first
+  @organisation.found_organisation_proposals.make(:proposer => founder).start
+  @organisation.proposed!
+end
+Given /^one member voted against the founding$/ do
+  @fop ||= @organisation.found_organisation_proposals.last
+  
+  # Don't make our user vote against the founding
+  @members_against = if @user
+    [(@organisation.members - [@user]).last]
+  else
+    [@organisation.members.last]
+  end
+    
+  @members_against.each do |m|
+    m.cast_vote(:against, @fop.id)
+  end
+end
+Given /^the founding vote still passed$/ do
+  members_in_favour = @organisation.members
+  members_in_favour -= @members_against if @members_against
+  
+  if members_in_favour.length < @organisation.minimum_members_required_for_founding_vote
+    raise RuntimeError, "not enough members left to pass founding vote"
+  end
+  
+  @fop ||= @organisation.found_organisation_proposals.last
+  
+  members_in_favour.each do |m|
+    m.cast_vote(:for, @fop.id)
+  end
+  
+  Proposal.close_proposals
+  
+  @fop.reload
+  raise RuntimeError, "expected founding vote to pass" unless @fop.passed?
+end
+Given /^I am a founding member$/ do
+  @user = @organisation.members.make(:pending, :member_class => @organisation.member_classes.find_by_name("Founding Member"))
+end
+When /^I choose "([^"]*)" for (.*) decisions$/ do |voting_system, decision_kind|
+  within(".#{decision_kind}_decisions") do
+    choose(voting_system)
+  end
+end
+Given /^I have received the email saying the founding vote has passed$/ do
+  @email = last_email
+  @email.subject.should include("has been formed")
+end
+Then /^the email should list the members who voted in favour of the founding$/ do
+  @email ||= last_email
+  @fop ||= @organisation.found_organisation_proposals.last
+  
+  for_members = @fop.votes.where(:for => true).map{|v| v.member}
+  
+  for_members.each do |m|
+    @email.body.should include(m.name)
+  end
+end
+Then /^the email should not list the member who voted against the founding$/ do
+  @email ||= last_email
+  @fop ||= @organisation.found_organisation_proposals.last
+  
+  against_members = @fop.votes.where(:for => false).map{|v| v.member}
+  
+  against_members.each do |m|
+    @email.body.should_not include(m.name)
+  end
+end
+def last_email
+  ActionMailer::Base.deliveries.last
+end
+Given /^the subdomain is "([^"]*)"$/ do |subdomain|
+  step %Q{the domain is "#{subdomain}.#{Setting[:base_domain].sub(/:\d+$/, '')}"}
+end
+When /^the domain is "([^"]*)"$/ do |domain|
+  if Capybara.current_driver == :selenium
+    Capybara.default_host = "http://#{domain}:#{Capybara.server_port}"
+    Capybara.app_host = "http://#{domain}:#{Capybara.server_port}"
+  else
+    Capybara.default_host = "http://#{domain}:#{Capybara.server_port}"
+    Capybara.app_host = "http://#{domain}"
+  end
+end

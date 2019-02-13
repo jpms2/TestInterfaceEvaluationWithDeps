@@ -1,0 +1,28 @@
+Classes: 3
+[name:Course, file:TheOdinProject_theodinproject\app\models\course.rb, step:Given ]
+[name:FactoryGirl, file:null, step:Given ]
+[name:Section, file:TheOdinProject_theodinproject\app\models\section.rb, step:Given ]
+
+Methods: 15
+[name:click, type:Object, file:null, step:When ]
+[name:each, type:Object, file:null, step:Given ]
+[name:eql, type:Object, file:null, step:Then ]
+[name:find, type:Object, file:null, step:When ]
+[name:find_by, type:Section, file:TheOdinProject_theodinproject\app\models\section.rb, step:Given ]
+[name:hashes, type:Object, file:null, step:Given ]
+[name:index, type:CoursesController, file:TheOdinProject_theodinproject\app\controllers\courses_controller.rb, step:null]
+[name:page, type:Object, file:null, step:When ]
+[name:page, type:Object, file:null, step:Then ]
+[name:parameterize, type:Object, file:null, step:Given ]
+[name:parameterize, type:Object, file:null, step:When ]
+[name:parameterize, type:Object, file:null, step:Then ]
+[name:show, type:CoursesController, file:TheOdinProject_theodinproject\app\controllers\courses_controller.rb, step:null]
+[name:to, type:Object, file:null, step:Then ]
+[name:within, type:Object, file:null, step:When ]
+
+Referenced pages: 4
+TheOdinProject_theodinproject\app\views\courses\index.html.erb
+TheOdinProject_theodinproject\app\views\courses\show.html.erb
+TheOdinProject_theodinproject\app\views\shared\_completion_percent.html.erb
+TheOdinProject_theodinproject\app\views\shared\_lc_index.html.erb
+

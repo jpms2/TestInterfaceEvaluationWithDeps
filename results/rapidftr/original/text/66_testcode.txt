@@ -1,0 +1,345 @@
+Given /^I am logged in as a user with "(.+)" permissions?$/ do |permissions|
+  username = 'mary'
+  password = '123'
+  data_populator.create_user(username, password, permissions)
+  login_page.login_as(username, password)
+end
+def data_populator
+  DataPopulator.new
+end
+def data_populator
+  DataPopulator.new
+end
+def login_page
+  @_login_page ||= LoginPage.new(Capybara.current_session)
+end
+  def create_user(username, password = 'radpiftr', permission = nil)
+    user_type = 'user'
+    create_account(user_type, username, password, permission)
+  end
+  def login_as(username, password)
+    visit_page
+    enter_username(username)
+    enter_password(password)
+    login
+  end
+  def create_account(user_type, username, password, permission)
+    permissions = []
+    permissions.push(Permission.all_permissions) if user_type.downcase == 'admin' && permission.nil?
+    permissions.push(Permission::CHILDREN[:register]) if user_type.downcase == 'user' && permission.nil?
+    permissions.push(Permission::REPORTS[:view]) if user_type.downcase == 'senior official' && permission.nil?
+    permissions.push(Permission::CHILDREN[:edit], Permission::CHILDREN[:register], Permission::CHILDREN[:view_and_search], Permission::ENQUIRIES[:create], Permission::ENQUIRIES[:update]) if user_type.downcase == 'registration worker' && permission.nil?
+    permissions.push(Permission::POTENTIAL_MATCHES[:read]) if user_type.downcase == 'registration worker' && permission.nil?
+    permissions.push(Permission.all_permissions) if permission.to_s.downcase.split(',').include?('admin')
+
+    permissions.push(permission.split(',')) if permission
+    permissions.flatten!
+
+    role_name = permissions.join('-')
+    role = Role.find_by_name(role_name) || Role.create(:name => role_name, :permissions => permissions)
+
+    @user = User.find_by_user_name(username)
+
+    if @user.nil?
+      @user = User.new(
+          :user_name => username,
+          :password => password,
+          :password_confirmation => password,
+          :full_name => username,
+          :organisation => 'UNICEF',
+          :disabled => 'false',
+          :email => "#{username}@test.com",
+          :role_ids => [role.id]
+      )
+      @user.save!
+    end
+    @user
+  end
+  def visit_page
+    @session.visit path_to('login page')
+  end
+  def enter_username(username)
+    @session.fill_in('User Name', :with => username)
+  end
+  def enter_password(password)
+    @session.fill_in('Password', :with => password)
+  end
+  def login
+    @session.click_button('Log in')
+  end
+  def visit_page
+    @session.visit path_to('new child page')
+  end
+  def path_to(page_name, options = {})
+    format = page_name[/^(?:|the )(\w+) formatted/, 1]
+    options.reverse_merge!(:format => format)
+    path_for_cuke_string(page_name, options) || fail("Can't find mapping from \"#{page_name}\" to a path.\nNow, go and add a mapping in #{__FILE__}")
+  end
+  def path_for_cuke_string(string_to_match, options = {})
+    our_key, our_proc = path_map.find { |key, _value| key.match(string_to_match) }
+    our_proc.call options, our_key.match(string_to_match)
+  end
+  def path_map
+    self.class.send :include, Rails.application.routes.url_helpers
+    @regexp_to_path_map ||= {
+      /the home\s?page/                              => proc { |_options, _matches| '/' },
+      /the new create_custom_field page/             => proc { |_options, _matches| new_create_custom_field_path },
+      /the new assign_unique_id_to_a_child page/     => proc { |options, _matches| new_assign_unique_id_to_a_child_path(options) },
+      /add child page/                               => proc { |options, _matches| new_child_path(options) },
+      /new child page/                               => proc { |options, _matches| new_child_path(options) },
+      /children listing page/                        => proc { |options, _matches| children_path(options) },
+      /children display page/                        => proc { |_options, _matches| },
+      /saved record page for child with name "(.+)"/ => proc do |options, matches|
+                                                          child_name = matches[1]
+                                                          child = Child.by_name(:key => child_name)
+                                                          fail "no child named '#{child_name}'" if child.nil? || child.empty?
+                                                          child_path(child.first, options)
+                                                        end,
+      /child record page for "(.+)"/                 => proc do |options, matches|
+                                                          child_name = matches[1]
+                                                          child = Child.by_name(:key => child_name)
+                                                          fail "no child named '#{child_name}'" if child.nil? || child.empty?
+                                                          child_path(child.first, options)
+                                                        end,
+      /child record page for unique id "(.+)"/       => proc do |options, matches|
+                                                          unique_id = matches[1]
+                                                          child = Child.get unique_id
+                                                          fail "no child with unique id '#{unique_id}'" if child.nil?
+                                                          child_path(child, options)
+                                                        end,
+      /change log page for "(.+)"/                   => proc do |options, matches|
+                                                          child_name = matches[1]
+                                                          child = Child.by_name(:key => child_name)
+                                                          fail "no child named '#{child_name}'" if child.nil? || child.empty?
+                                                          child_history_path(child.first, options)
+                                                        end,
+      /new user page/                                => proc { |options, _matches| new_user_path(options) },
+      /manage users page/                            => proc { |options, _matches| users_path(options) },
+      /edit user page for "(.+)"/                    => proc do |options, matches|
+                                                          user = User.find_by_user_name(matches[1])
+                                                          edit_user_path(user, options)
+                                                        end,
+      /user details page for "(.+)"/                 => proc do |options, matches|
+                                                          user = User.find_by_user_name(matches[1])
+                                                          user_path(user, options)
+                                                        end,
+      /basic search page/                            => proc { |options, _matches| search_path(options) },
+      /child advanced search page/                   => proc { |options, _matches| advanced_search_index_path(options) },
+      /login page/                                   => proc { |options, _matches| login_path(options) },
+      /logout page/                                  => proc { |options, _matches| logout_path(options) },
+      /search results page/                          => proc { |options, _matches| search_path(options) },
+      /child advanced search results page/           => proc { |options, _matches| advanced_search_index_path(options) },
+      /edit form section page for "(.+)"$/           => proc { |_options, matches| edit_form_section_path(:id => matches[1]) },
+      /edit field page for "(.+)" on "(.+)" form$/   => proc { |_options, matches| edit_form_section_field_path(:form_section_id => matches[2], :id => matches[1]) },
+      /form section page/                            => proc { |options, _matches| form_sections_path(options) },
+      /choose field type page/                       => proc do |options, _matches|
+                                                          arbitrary_form_section = FormSection.new
+                                                          new_form_section_field_path(arbitrary_form_section, options)
+                                                        end,
+      /the edit user page for "(.+)"$/               => proc do |_options, matches|
+                                                          user = User.by_user_name(:key => matches[1])
+                                                          fail "no user named #{matches[1]}" if user.nil?
+                                                          edit_user_path(user)
+                                                        end,
+      /new field page for "(.+)" for form "(.+)"/    => proc do |_options, matches|
+                                                          field_type = matches[1]
+                                                          form_section_id = matches[2]
+                                                          new_form_section_field_path(:form_section_id => form_section_id, :type => field_type)
+                                                        end,
+      /the edit form section page for "(.+)"/        => proc do |_options, matches|
+                                                          form_section = matches[1]
+                                                          form_section_fields_path(form_section)
+                                                        end,
+      /the admin page/                               => proc { |options, _matches| admin_path(options) },
+      /system settings page/                         => proc { |options, _matches| admin_path(options) },
+      /system users page/                            => proc { |_options, _matches| system_users_path },
+      /all child Ids/                                => proc { |_options, _matches| child_ids_path },
+      /the child listing filtered by (.+)/           => proc { |_options, matches| child_filter_path(:filter => matches[1]) },
+      /duplicate child page for "(.+)"$/             => proc do |_options, matches|
+                                                          child = Child.by_name(:key => matches[1]).first
+                                                          new_child_duplicate_path(child)
+                                                        end,
+      /create role page/                             => proc { |_options, _matches| new_role_path },
+      /roles index page/                             => proc { |_options, _matches| roles_path },
+      /devices listing page/                         => proc { |_options, _matches| devices_path },
+      /replications page/                            => proc { |_options, _matches| replications_path },
+      /reports page/                                 => proc { |_options, _matches| reports_path },
+      /the form sections page for "(.*)"/            => proc { |_options, matches| form_form_sections_path(Form.by_name.key(matches[1]).first) },
+      /forms page/                                   => proc { |_options, _matches| forms_path },
+      /standard form page/                           => proc { |_options, _matches| standard_forms_path },
+      /enquiries listing page/                       => proc { |_options, _matches| enquiries_path },
+      /enquiry page for "(.*)"/                      => proc { |_options, matches| enquiry_path(matches[1]) }
+    }
+  end
+When /^(?:|I )(?:can )?follow "([^\"]*)"(?: within "([^\"]*)")?$/ do |link, selector|
+  with_scope(selector) do
+    click_link(link)
+  end
+end
+When /^(?:|I )fill in "([^\"]*)" with "([^\"]*)"(?: within "([^\"]*)")?$/ do |field, value, selector|
+  with_scope(selector) do
+    fill_in(field, :visible => true, :with => value)
+  end
+end
+Then /^(?:|I )should see "([^\"]*)"(?: within "([^\"]*)")?$/ do |text, selector|
+  with_scope(selector) do
+    if defined?(Spec::Rails::Matchers)
+      expect(page).to have_content(text)
+    else
+      assert page.has_content?(text)
+    end
+  end
+end
+Then /^(?:|I )should not see "([^\"]*)"(?: within "([^\"]*)")?$/ do |text, selector|
+  with_scope(selector) do
+    if defined?(Spec::Rails::Matchers)
+      expect(page).to have_no_content(text)
+    else
+      assert page.has_no_content?(text)
+    end
+  end
+end
+  def with_scope(locator)
+    locator ? within(locator) { yield } : yield
+  end
+  def with_scope(locator)
+    locator ? within(:css, locator) { yield } : yield
+  end
+Given /^the following enquiries exist in the system:$/ do |enquiry_table|
+  enquiry_table.hashes.each do |enquiry_hash|
+    create_enquiry(enquiry_hash)
+  end
+end
+When /^I confirm child match with unique_id "([^\"]*)"$/ do |unique_id|
+  within(:css, "#confirm_#{unique_id}") do
+    find('a').click
+  end
+end
+def create_enquiry(enquiry_hash)
+  enquiry_hash.reverse_merge!(enquiry_defaults)
+
+  user_name = enquiry_hash['created_by']
+  user = data_populator.ensure_user_exists(user_name)
+
+  enquiry = Enquiry.new_with_user_name(user, enquiry_hash)
+  enquiry.create!
+end
+def enquiry_defaults
+  {
+    'created_by' => 'Billy',
+    'created_organisation' => 'UNICEF'
+  }
+end
+  def ensure_user_exists(user_name)
+    user = User.find_by_user_name(user_name)
+    if user.nil?
+      user = create_user(user_name)
+    end
+    user
+  end
+When /^I click the "(.*)" button$/ do |button_value|
+  click_button button_value
+end
+When /^I click the "(.*)" link$/ do |link|
+  click_link link
+end
+Given /^the following forms exist in the system:$/ do |forms_table|
+  forms_table.hashes.each do |form_hash|
+    form_hash.reverse_merge!('unique_id' => form_hash['name'].gsub(/\s/, '_').downcase)
+    destroy_form(form_hash['name'])
+    form = Form.new(form_hash)
+    form.save!
+  end
+end
+Given /^the following form sections exist in the system on the "(.*)" form:$/ do |form_name, form_sections_table|
+  destroy_form(form_name)
+
+  form = Form.create(:name => form_name)
+  form_sections_table.hashes.each do |form_section_hash|
+    form_section_hash.reverse_merge!(
+      'unique_id' => form_section_hash['name'].gsub(/\s/, '_').downcase,
+      'fields' => Array.new,
+      'form' => form
+    )
+
+    form_section_hash['order'] = form_section_hash['order'].to_i
+    form_section = FormSection.new(form_section_hash)
+    form_section.save!
+  end
+end
+Given /^the following fields exists on "([^"]*)":$/ do |form_section_name, table|
+  form_section = FormSection.get_by_unique_id(form_section_name)
+  expect(form_section).not_to be_nil
+  form_section.fields = []
+  table.hashes.each do |field_hash|
+    field_hash.reverse_merge!(
+      'visible' => true,
+      'type' => Field::TEXT_FIELD
+    )
+    form_section.fields.push FactoryGirl.build(:field, field_hash)
+  end
+
+  form_section.save!
+end
+def destroy_form(form_name)
+  form = Form.find_by_name(form_name)
+  form.sections.each { |section| section.destroy } unless form.nil?
+  form.destroy unless form.nil?
+end
+Given /^the following children exist in the system:$/ do |children_table|
+  children_table.hashes.each do |child_hash|
+    create_child(child_hash)
+  end
+end
+def create_child(child_hash)
+  child_hash.reverse_merge!(child_defaults)
+
+  user_name = child_hash['created_by']
+  user = data_populator.ensure_user_exists(user_name)
+
+  if child_hash['duplicate'] == 'true'
+    child_hash.reverse_merge!('duplicate_of' => '123')
+  else
+    child_hash.delete('duplicate')
+  end
+
+  if child_hash['created_organisation']
+    user.update_attributes(:organisation => child_hash['created_organisation'])
+  end
+
+  child_hash['flag_at'] = child_hash['flagged_at'] || DateTime.new(2001, 2, 3, 4, 5, 6)
+  child_hash['reunited_at'] = child_hash['reunited_at'] || DateTime.new(2012, 2, 3, 4, 5, 6)
+  flag, flag_message = child_hash.delete('flag').to_s == 'true', child_hash.delete('flag_message')
+
+  photo = uploadable_photo(child_hash.delete('photo_path')) if child_hash['photo_path'] != ''
+  child_hash['unique_identifier'] = child_hash.delete('unique_id') if child_hash['unique_id']
+  child_hash['_id'] = child_hash['unique_identifier'] if child_hash['unique_identifier']
+  child = Child.new_with_user_name(user, child_hash)
+  child.photo = photo
+  child['histories'] << {'datetime' => child_hash['flag_at'], 'changes' => {'flag' => 'anything'}}
+  child['histories'] << {'datetime' => child_hash['reunited_at'], 'changes' => {'reunited' => {'from' => nil, 'to' => 'true'}, 'reunited_message' => {'from' => nil, 'to' => 'some message'}}}
+
+  child.create!
+  # Need this because of how children_helper grabs flag_message from child history - cg
+  if flag
+    child['flag'] = flag
+    child['flag_message'] = flag_message
+    child.save!
+  end
+end
+def child_defaults
+  {
+    'birthplace' => 'Cairo',
+    'photo_path' => 'features/resources/jorge.jpg',
+    'reporter' => 'zubair',
+    'created_by' => 'Billy',
+    'created_organisation' => 'UNICEF',
+    'age_is' => 'Approximate',
+    'flag_message' => 'Reason for flagging',
+    'flagged_at' => DateTime.new(2001, 2, 3, 4, 5, 6),
+    'reunited_at' => DateTime.new(2012, 2, 3, 4, 5, 6)
+  }
+end
+def data_populator
+  DataPopulator.new
+end

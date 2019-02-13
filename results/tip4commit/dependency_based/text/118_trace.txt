@@ -1,0 +1,7 @@
+[path:\features\step_definitions\common.rb, methods:[80, 90, 4, 24, 104, 16, 28, 32, 54, 112, 76, 96, 8, 62, 68, 72, 20, [name:add_new_commit, step:Given ], [name:find_new_commit, step:Given ]]]
+[path:\features\step_definitions\tip_modifier_interface.rb, methods:[0, 34, 14, 22, 18, 26, 30, 39, 45, 80, 6, 62]]
+[path:\features\step_definitions\web.rb, methods:[0, 25, 29, 33, 37, 41, 45, 15]]
+[path:\features\support\finders.rb, methods:[[name:find_project, step:When ]]]
+[path:\spec\factories\deposit.rb, methods:[[name:create!, step:Given ]]]
+[path:\spec\factories\project.rb, methods:[[name:create!, step:Given ], [name:tip_commits, step:When ], [name:where, step:When ]]]
+[path:\spec\factories\tip.rb, methods:[[name:find_by, step:Then ]]]

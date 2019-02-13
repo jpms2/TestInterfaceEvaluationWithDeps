@@ -1,0 +1,297 @@
+When /^(?:|I )go to (.+)$/ do |page_name|
+  visit path_to(page_name)
+end
+  def path_to(page_name)
+    options = {}
+    options[:format] = :m if @mobile_interface 
+    options[:locale] = @locale if @locale
+    options[:_group_view_by] = @group_view_by if @group_view_by
+    @source_view = nil
+    
+    case page_name
+
+    when /the home\s?page/
+      @source_view = "todos"
+      root_path(options)
+
+    when /the done page/
+      @source_view = "done"
+      done_overview_path(options)
+    when /the done actions page for context "([^"]*)"/i
+      @source_view = "done"
+      context = @current_user.contexts.where(:name => $1).first
+      done_todos_context_path(context, options)
+    when /the done actions page for project "([^"]*)"/i
+      @source_view = "done"
+      project = @current_user.projects.where(:name => $1).first
+      done_todos_project_path(project, options)
+    when /the done actions page for tag "([^"]*)"/i
+      @source_view = "done"
+      done_tag_path($1, options)
+    when /the done actions page/
+      @source_view = "done"
+      done_todos_path(options)
+    when /the all done actions page for context "([^"]*)"/i
+      @source_view = "done"
+      context = @current_user.contexts.where(:name => $1).first
+      all_done_todos_context_path(context, options)
+    when /the all done actions page for project "([^"]*)"/i
+      @source_view = "done"
+      project = @current_user.projects.where(:name => $1).first
+      all_done_todos_project_path(project, options)
+    when /the all done actions page for tag "([^"]*)"/i
+      @source_view = "done"
+      all_done_tag_path($1, options)
+    when /the all done actions page/
+      @source_view = "done"
+      all_done_todos_path(options)
+
+    when /the statistics page/
+      @source_view = "stats"
+      stats_path(options)
+    when /the signup page/
+      signup_path(options)
+    when /the login page/
+      login_path(options)
+    when /the logout page/
+      logout_path(options)
+    when /the notes page/
+      notes_path(options)
+    when /the calendar page/
+      calendar_path(options)
+    when /the review page/
+      @source_view = "review"
+      review_path(options)
+    when /the contexts page/
+      @source_view = "context"
+      contexts_path(options)
+    when /the projects page/
+      @source_view = "project"
+      projects_path(options)
+    when /the manage users page/
+      users_path(options)
+    when /the recurring todos page/
+      recurring_todos_path(options)
+    when /the integrations page/
+      integrations_path(options)
+    when /the tickler page/
+      @source_view = "deferred"
+      tickler_path(options)
+    when /the export page/
+      data_path(options)
+    when /the preference page/
+      preferences_path(options)
+    when /the rest api docs page/
+      rest_api_docs_path(options)
+    when /the search page/
+      search_path(options)
+    when /the starred page/
+      tag_path("starred", options)
+    when /the feeds page/
+      feeds_path(options)
+    when /the context page for "([^\"]*)" for user "([^\"]*)"/i
+      @source_view = "context"
+      @context = User.where(:login => $2).first.contexts.where(:name => $1).first
+      context_path(@context, options)
+    when /the context page for "([^\"]*)"/i
+      @source_view = "context"
+      @context = @current_user.contexts.where(:name => $1).first
+      context_path(@context, options)
+    when /the "([^\"]*)" context/i
+      @source_view = "context"
+      @context = @current_user.contexts.where(:name => $1).first
+      context_path(@context, options)
+    when /the "([^\"]*)" project for user "([^\"]*)"/i
+      @source_view = "project"
+      @project = User.where(:login => $2).first.projects.where(:name => $1).first
+      project_path(@project, options)
+    when /the "([^\"]*)" project/i
+      @source_view = "project"
+      @project = @current_user.projects.where(:name => $1).first
+      project_path(@project, options)
+    when /the tag page for "([^"]*)"/i
+      @source_view = "tag"
+      tag_path($1, options)
+    when /the change password page/
+      change_password_user_path @current_user
+      
+    # Add more mappings here.
+    # Here is an example that pulls values out of the Regexp:
+    #
+    #   when /^(.*)'s profile page$/i
+    #     user_profile_path(User.where(:login => $1))first.
+
+    else
+      begin
+        page_name =~ /the (.*) page/
+        path_components = $1.split(/\s+/)
+        self.send(path_components.push('path').join('_').to_sym)
+      rescue Object => e
+        raise "Can't find mapping from \"#{page_name}\" to a path.\n" +
+          "Now, go and add a mapping in #{__FILE__}"
+      end
+    end
+  end
+Given /^I have a context called "([^\"]*)"$/ do |context_name|
+  step "there exists an active context called \"#{context_name}\" for user \"#{@current_user.login}\""
+end
+When /^I edit the context name in place to be "([^\"]*)"$/ do |new_context_name|
+  page.find("span#context_name").click
+  fill_in "value", :with => new_context_name
+  click_button "Ok"
+  wait_for_ajax
+end
+  def wait_for_ajax
+    wait_until do
+      page.evaluate_script('jQuery.active').zero?
+    end
+  end
+  def wait_until(wait_time = Capybara.default_wait_time)
+    Timeout.timeout(wait_time) do
+      loop until yield
+    end
+  end
+Then /^I should see the todo "([^\"]*)"$/ do |todo_description|
+  expect(page).to have_xpath("//span[.=\"#{todo_description}\"]", :visible => true)
+end
+Then /^the context field of the new todo form should contain "([^"]*)"$/ do |context_name|
+  xpath= "//form[@id='todo-form-new-action']/input[@id='todo_context_name']"
+  expect(page.find(:xpath, xpath).value).to eq(context_name)
+end
+Given /^the following user records?$/ do |table|
+  User.delete_all
+  table.hashes.each do |hash|
+    user = FactoryGirl.create(:user, hash)
+    user.create_preference({:locale => 'en'})
+  end
+end
+Given /^I have logged in as "(.*)" with password "(.*)"$/ do |username, password|
+  user = User.where(:login => username).first
+  request_signin_as(user)
+  @current_user = user
+end
+  def request_signin_as(user)
+    visit "/test_login_backdoor?user_id=#{user.id}"
+  end
+Given /^there exists a project (?:|called )"([^"]*)" for user "([^"]*)"$/ do |project_name, user_name|
+  user = User.where(:login => user_name).first
+  expect(user).to_not be_nil
+  @project = user.projects.create!(:name => project_name)
+  # acts_as_list adds at top by default, but that is counter-intuitive when reading scenario's, so reverse this
+  @project.move_to_bottom
+end
+Given /^I have a project (?:|called )"([^"]*)"$/ do |project_name|
+  @project = @current_user.projects.create!(:name => project_name)
+end
+When /^I edit the project name to "([^\"]*)"$/ do |new_title|
+  edit_project(@project) do
+    fill_in "project[name]", :with => new_title
+  end
+end
+When /^I edit the default context to "([^"]*)"$/ do |default_context|
+  edit_project(@project) do
+    fill_in "project[default_context_name]", :with => default_context
+  end
+end
+  def edit_project(project)
+    open_project_edit_form(project)
+    within "form#edit_form_project_#{project.id}" do
+      yield
+    end
+    submit_project_edit_form(project)
+    
+    wait_for_ajax
+    wait_for_animations_to_end
+    
+    expect(page).to_not have_css("button#submit_project_#{project.id}", :visible => true)
+  end
+  def open_project_edit_form(project)
+    click_link "link_edit_project_#{project.id}"
+    expect(page).to have_css("button#submit_project_#{project.id}")
+  end
+  def submit_project_edit_form(project)
+    page.find("button#submit_project_#{project.id}").click
+  end
+  def wait_for_animations_to_end
+    wait_until do
+      page.evaluate_script('$(":animated").length').zero?
+    end
+  end
+  def wait_for_ajax
+    wait_until do
+      page.evaluate_script('jQuery.active').zero?
+    end
+  end
+Given /^I have (\d+) todos in project "([^"]*)" in context "([^"]*)" with tags "([^"]*)" prefixed by "([^"]*)"$/ do |number_of_todos, project_name, context_name, tag_names, prefix|
+  @context = find_context(context_name)
+  @project = find_project(project_name)
+
+  @todos = []
+  number_of_todos.to_i.downto 1 do |i|
+    todo = @current_user.todos.create!(:context_id => @context.id, :description => "#{prefix}todo #{i}", :project_id => @project.id)
+    todo.tag_with(tag_names)
+    todo.save!
+    @todos << todo
+  end
+end
+When /^I submit a new action with description "([^"]*)"$/ do |description|
+  within "form#todo-form-new-action" do
+    fill_in "todo[description]", :with => description
+  end
+  submit_next_action_form
+end
+  def find_context(context_name)
+    context = @current_user.contexts.where(:name => context_name).first
+    expect(context).to_not be_nil
+    return context
+  end
+  def find_project(project_name)
+    project = @current_user.projects.where(:name => project_name).first
+    expect(project).to_not be_nil
+    return project
+  end
+  def submit_next_action_form
+    submit_form("//form[@id='todo-form-new-action']", "todo_new_action_submit")
+  end
+  def submit_form(form_xpath, button_name)
+    handle_js_confirm do
+      # on calendar page there can be more than 1 occurance of a todo, so we select the first here
+      within all(:xpath, form_xpath)[0] do
+        click_button(button_name)
+      end
+      wait_for_ajax
+      wait_for_animations_to_end
+    end
+  end
+  def wait_for_animations_to_end
+    wait_until do
+      page.evaluate_script('$(":animated").length').zero?
+    end
+  end
+  def wait_for_ajax
+    wait_until do
+      page.evaluate_script('jQuery.active').zero?
+    end
+  end
+  def handle_js_confirm(accept=true)
+    execute_javascript "window.original_confirm_function = window.confirm"
+    execute_javascript "window.confirmMsg = null"
+    execute_javascript "window.confirm = function(msg) { window.confirmMsg = msg; return #{!!accept}; }"
+    yield
+  ensure
+    execute_javascript "window.confirm = window.original_confirm_function"
+  end
+  def wait_until(wait_time = Capybara.default_wait_time)
+    Timeout.timeout(wait_time) do
+      loop until yield
+    end
+  end
+  def execute_javascript(js)
+    page.execute_script(js)
+  end
+Given /^there exists (an active|a hidden|a closed) context called "([^"]*)" for user "([^"]*)"$/ do |state, context_name, login|
+  user = User.where(:login => login).first
+  expect(user).to_not be_nil
+  context_state = {"an active" => "active", "a hidden" => "hidden", "a closed" => "closed"}[state]
+  @context = user.contexts.where(:name => context_name, :state => context_state).first_or_create
+end

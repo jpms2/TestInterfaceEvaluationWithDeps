@@ -1,0 +1,307 @@
+Feature: Tag wrangling: assigning wranglers, using the filters on the Wranglers page
+Scenario: Updating multiple tags works.
+Given the following typed tags exists
+| name                                   | type         |
+| Cowboy Bebop                           | Fandom       |
+| Spike Spiegel is a sweetie             | Freeform     |
+| Jet Black is a sweetie                 | Freeform     |
+And I am logged in as a random user
+And I post the work "Brain Scratch" with fandom "Cowboy Bebop" with freeform "Spike Spiegel is a sweetie"
+And I post the work "Asteroid Blues" with fandom "Cowboy Bebop" with freeform "Jet Black is a sweetie"
+When the tag wrangler "lain" with password "lainnial" is wrangler of "Cowboy Bebop"
+And I follow "Tag Wrangling"
+And I follow "2"
+And I fill in "fandom_string" with "Cowboy Bebop"
+And I check the mass wrangling option for "Spike Spiegel is a sweetie"
+And I check the mass wrangling option for "Jet Black is a sweetie"
+And I press "Wrangle"
+Then I should see "The following tags were successfully wrangled to Cowboy Bebop: Spike Spiegel is a sweetie, Jet Black is a sweetie"
+Scenario: Updating multiple tags works and set them as canonical
+Given the following typed tags exists
+| name                                   | type         | canonical |
+| Cowboy Bebop                           | Fandom       | true      |
+| Faye Valentine is a sweetie            | Freeform     | false     |
+| Ed is a sweetie                        | Freeform     | false     |
+And I am logged in as a random user
+And I post the work "Asteroid Blues" with fandom "Cowboy Bebop" with freeform "Ed is a sweetie"
+And I post the work "Honky Tonk Women" with fandom "Cowboy Bebop" with freeform "Faye Valentine is a sweetie"
+When the tag wrangler "lain" with password "lainnial" is wrangler of "Cowboy Bebop"
+And I follow "Tag Wrangling"
+And I follow "2"
+And I fill in "fandom_string" with "Cowboy Bebop"
+And I check the mass wrangling option for "Faye Valentine is a sweetie"
+And I check the mass wrangling option for "Ed is a sweetie"
+And I check the canonical option for the tag "Faye Valentine is a sweetie"
+And I check the canonical option for the tag "Ed is a sweetie"
+And I press "Wrangle"
+Then I should see "The following tags were successfully wrangled to Cowboy Bebop: Faye Valentine is a sweetie, Ed is a sweetie Wrangle Tags for Cowboy Bebop"
+And the "Faye Valentine is a sweetie" tag should be canonical
+And the "Ed is a sweetie" tag should be canonical
+Scenario: Tags that don't exist cause errors
+Given the following activated tag wrangler exists
+| login          |
+| wranglerette   |
+When I am logged in as "wranglerette"
+Then visiting "/tags/this_is_an_unknown_tag/edit" should fail with an error
+And visiting "/tags/this_is_an_unknown_tag/show" should fail with an error
+And visiting "/tags/this_is_an_unknown_tag/feed.atom" should fail with an error
+Scenario: Banned tags can only be viewed by an admin
+Given the following typed tags exists
+| name                                   | type         |
+| Cowboy Bebop                           | Banned       |
+When I am logged in as a random user
+And I view the tag "Cowboy Bebop"
+Then I should see "Sorry, you don't have permission to access the page you were trying to reach."
+When I am logged in as an admin
+And I view the tag "Cowboy Bebop"
+Then I should not see "Please log in as an admin"
+And I should see "Cowboy Bebop"
+@javascript
+Scenario: A user can see hidden tags
+Given the following typed tags exists
+| name                                   | type         | canonical |
+| Cowboy Bebop                           | Fandom       | true      |
+| Faye Valentine is a sweetie            | Freeform     | false     |
+| Ed is a sweetie                        | Freeform     | false     |
+And I am logged in as "first_user"
+And I post the work "Asteroid Blues" with fandom "Cowboy Bebop" with freeform "Ed is a sweetie" with second freeform "Faye Valentine is a sweetie"
+And I should see "Work was successfully posted."
+And I am logged in as "second_user" with password "secure_password" with preferences set to hidden warnings and additional tags
+When I view the work "Asteroid Blues"
+And I follow "Show additional tags"
+Then I should see "Additional Tags: Ed is a sweetie, Faye Valentine is a sweetie"
+And I should not see "Show additional tags"
+@javascript
+Scenario: A user can see hidden tags on a series
+Given the following typed tags exists
+| name                                   | type         | canonical |
+| Cowboy Bebop                           | Fandom       | true      |
+| Faye Valentine is a sweetie            | Freeform     | false     |
+| Ed is a sweetie                        | Freeform     | false     |
+And I limit myself to the Archive
+And I am logged in as "first_user"
+And I post the work "Asteroid Blues" with fandom "Cowboy Bebop" with freeform "Ed is a sweetie" as part of a series "Cowboy Bebop Blues"
+And I post the work "Wild Horses" with fandom "Cowboy Bebop" with freeform "Faye Valentine is a sweetie" as part of a series "Cowboy Bebop Blues"
+When I am logged in as "second_user" with password "secure_password" with preferences set to hidden warnings and additional tags
+And I go to first_user's user page
+And I follow "Cowboy Bebop Blues"
+Then I should see "Asteroid Blues"
+And I should see "Wild Horses"
+And I should not see "Ed is a sweetie"
+When I follow "Show additional tags"
+Then I should see "Ed is a sweetie"
+And I should not see "No Archive Warnings Apply" within "li.warnings"
+When I follow "Show warnings"
+Then I should see "No Archive Warnings Apply" within "li.warnings"
+Feature: Tag Wrangling - Unsorted Tags
+Scenario: Updating multiple tags works.
+Given I am logged in as a tag wrangler
+And the following typed tags exists
+| name                                   | type     |
+| Cowboy Bebop                           | Unsorted_tag |
+| Serial experiments lain                | Unsorted_tag |
+| Spike Spiegel                          | Unsorted_tag |
+| Annalise Keating & Bonnie Winterbottom | Unsorted_tag |
+| i love good omens                      | Unsorted_tag |
+When I go to the unsorted_tags page
+And I select "Fandom" for the unsorted tag "Cowboy Bebop"
+And I select "Fandom" for the unsorted tag "Serial experiments lain"
+And I select "Character" for the unsorted tag "Spike Spiegel"
+And I select "Relationship" for the unsorted tag "Annalise Keating & Bonnie Winterbottom"
+And I select "Freeform" for the unsorted tag "i love good omens"
+And I press "Update"
+Then I should see "Tags were successfully sorted"
+And the "Cowboy Bebop" tag should be a "Fandom" tag
+And the "Serial experiments lain" tag should be a "Fandom" tag
+And the "Spike Spiegel" tag should be a "Character" tag
+And the "Annalise Keating & Bonnie Winterbottom" tag should be a "Relationship" tag
+And the "i love good omens" tag should be a "Freeform" tag
+Feature: Tag Cloud
+In order to browse by the most used additional tags
+As an archive user or visitor
+I should be able to view some tags in a tag cloud
+Scenario: tag cloud should only contain top-level canonical freeforms in "No Fandom"
+I want to check that:
+non-canonical used freeforms do not show up in cloud, whether unwrangled, fandomish or no fandomish
+canonical freeforms within No Fandom but with no uses at all do not show
+canonical freeforms that are fandomish or unwrangled do not show up, even used
+canonical freeforms within No Fandom, with no uses but with used mergers show up TODO
+canonical freeforms within No Fandom, with uses, show up TODO
+metatag freeforms with uses show up and their subtags do not anymore TODO
+metatag freeforms with no uses do not show and neither do their subtags (which I think is bad) TODO
+Given tag wrangling is on
+And the following activated tag wrangler exists
+| login  | password    |
+| Enigel | wrangulate! |
+And basic tags
+And a fandom exists with name: "Firefly", canonical: true
+And a freeform exists with name: "Non-canonical NoFandom", canonical: false
+And a freeform exists with name: "Non-canonical Fandomish", canonical: false
+And a freeform exists with name: "Non-canonical unwrangled", canonical: false
+And a freeform exists with name: "Canonical unused NoFandom", canonical: true
+And a freeform exists with name: "Canonical Fandomish", canonical: true
+And a freeform exists with name: "Canonical unwrangled", canonical: true
+When I am logged in as "author" with password "password"
+And I go to the new work page
+And I select "Not Rated" from "Rating"
+And I check "No Archive Warnings Apply"
+And I fill in "Fandoms" with "Firefly"
+And I fill in "Work Title" with "Silliness"
+And I fill in "Additional Tags" with "100 words, five things, objects in space, Sentient Serenity, Episode Tag, Non-canonical NoFandom, Non-canonical Fandomish, Non-canonical unwrangled, Canonical Fandomish, Canonical unwrangled"
+And I fill in "content" with "And then everyone was kidnapped by an alien bus."
+And I press "Preview"
+And I press "Post"
+Then I should see "Work was successfully posted."
+When I am logged out
+And I follow "Tags" within "ul.navigation"
+Then I should not see "100 words"
+And I should not see "five things"
+When I am logged in as "Enigel" with password "wrangulate!"
+And I edit the tag "five things"
+And I fill in "Fandoms" with "No Fandom"
+And I press "Save changes"
+And I follow "New Tag"
+And I fill in "Name" with "5 Things"
+And I choose "Freeform"
+And I check "Canonical"
+And I press "Create Tag"
+And I follow "New Tag"
+And I fill in "Name" with "N Things"
+And I choose "Freeform"
+And I check "Canonical"
+And I press "Create Tag"
+And I follow "Tags"
+Then I should not see "Five Things"
+And I should not see "5 Things"
+And I should not see "N Things"
+When I post the work "Test"
+And I edit the work "Test"
+And I fill in "Additional Tags" with "Five Things"
+And I press "Preview"
+And I press "Update"
+And I follow "Tags"
+Then I should not see "Five Things"
+When I edit the tag "Non-canonical NoFandom"
+And I fill in "Fandoms" with "No Fandom"
+And I press "Save changes"
+And I edit the tag "Non-canonical Fandomish"
+And I fill in "Fandoms" with "Firefly"
+And I press "Save changes"
+And I edit the tag "Canonical unused NoFandom"
+And I fill in "Fandoms" with "No Fandom"
+And I press "Save changes"
+And I edit the tag "Canonical Fandomish"
+And I fill in "Fandoms" with "Firefly"
+And I press "Save changes"
+Then I should see "Tag was updated"
+When I follow "Tags"
+Then I should not see "Non-canonical NoFandom"
+And I should not see "Non-canonical Fandomish"
+And I should not see "Non-canonical unwrangled"
+And I should not see "Canonical unused NoFandom"
+And I should not see "Canonical Fandomish"
+And I should not see "Canonical unwrangled"
+When I follow "Random"
+Then I should not see "Non-canonical NoFandom"
+And I should not see "Non-canonical Fandomish"
+And I should not see "Non-canonical unwrangled"
+And I should not see "Canonical unused NoFandom"
+And I should not see "Canonical Fandomish"
+And I should not see "Canonical unwrangled"
+Feature: Admin Actions to manage users
+In order to manage user accounts
+As an an admin
+I want to be able to look up and edit individual users
+Scenario: A user is banned with a note
+Given the user "mrparis" exists and is activated
+And I am logged in as an admin
+When I go to the abuse administration page for "mrparis"
+And I choose "Suspend permanently (ban user)"
+And I fill in "Notes" with "To the New Zealand penal colony with you."
+When I press "Update"
+Then I should see "User has been permanently suspended."
+And I should see "Suspended Permanently"
+And I should see "To the New Zealand penal colony with you."
+When I follow "Manage Users"
+And I fill in "query" with "mrparis"
+And I press "Find"
+Then I should see "1 user found"
+When I follow "Details"
+Then I should see "To the New Zealand penal colony with you."
+Feature: Admin Actions for Works and Bookmarks
+As an admin
+I should be able to perform special actions on works
+Scenario: Can edit tags on works
+Given basic tags
+And I am logged in as "regular_user"
+And I post the work "Changes" with fandom "User-Added Fandom" with freeform "User-Added Freeform" with category "M/M"
+When I am logged in as an admin
+And I view the work "Changes"
+And I follow "Edit Tags and Language"
+When I select "Mature" from "Rating"
+And I uncheck "No Archive Warnings Apply"
+And I check "Choose Not To Use Archive Warnings"
+And I fill in "Fandoms" with "Admin-Added Fandom"
+And I fill in "Relationships" with "Admin-Added Relationship"
+And I fill in "Characters" with "Admin-Added Character"
+And I fill in "Additional Tags" with "Admin-Added Freeform"
+And I uncheck "M/M"
+And I check "Other"
+When I press "Post Without Preview"
+Then I should not see "User-Added Fandom"
+And I should see "Admin-Added Fandom"
+And I should not see "User-Added Freeform"
+And I should see "Admin-Added Freeform"
+And I should not see "M/M"
+And I should see "Other"
+And I should not see "No Archive Warnings Apply"
+And I should see "Creator Chose Not To Use Archive Warnings"
+And I should not see "Not Rated"
+And I should see "Mature"
+And I should see "Admin-Added Relationship"
+And I should see "Admin-Added Character"
+When I follow "Activities"
+Then I should see "View Admin Activity"
+When I visit the last activities item
+Then I should see "No Archive Warnings Apply"
+And I should see "Old tags"
+And I should see "User-Added Fandom"
+And I should not see "Admin-Added Fandom"
+Feature: Basic collection navigation
+Scenario: Collections can be filtered by media type
+Given I have the collection "We all sing together"
+And I have a canonical "TV Shows" fandom tag named "Steven's Universe"
+And I have a canonical "Movies" fandom tag named "High School Musical"
+When I am logged in as "Brian" with password "They called him Brian"
+And I post the work "Stronger than you" with fandom "Steven's Universe" in the collection "We all sing together"
+And I post the work "Breaking Free" with fandom "High School Musical" in the collection "We all sing together"
+And I go to "We all sing together" collection's page
+And I follow "Fandoms ("
+And I select "Movies" from "medium_id"
+And I press "Show"
+Then I should see "High School Musical"
+And I should not see "Steven's Universe"
+When I select "TV Shows" from "medium_id"
+And I press "Show"
+Then I should not see "High School Musical"
+And I should see "Steven's Universe"
+Feature: There is a list of unassigned Fandoms
+Scenario: A user can see the list of fandoms and filter it
+Given I have a canonical "TV Shows" fandom tag named "Steven Universe"
+And I have a canonical "Movies" fandom tag named "High School Musical"
+And I am logged in as "author"
+And I post the work "Stronger than you" with fandom "Steven Universe"
+And I post the work "Breaking free" with fandom "High School Musical"
+And I am logged in as a tag wrangler
+When I go to the unassigned fandoms page
+Then I should see "Steven Universe"
+And I should see "High School Musical"
+When I select "TV Shows" from "media_id"
+And I press "Sort and Filter"
+Then I should see "Steven Universe"
+And I should not see "High School Musical"
+When I select "Movies" from "media_id"
+And I press "Sort and Filter"
+Then I should see "High School Musical"
+When I follow "High School Musical"
+Then I should see "This tag belongs to the Fandom Category."

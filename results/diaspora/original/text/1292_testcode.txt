@@ -1,0 +1,147 @@
+When /^I (?:sign|log) in as "([^"]*)"$/ do |email|
+  @me = User.find_by_email(email)
+  @me.password ||= 'password'
+  automatic_login
+  confirm_login
+end
+  def automatic_login
+    @me ||= FactoryGirl.create(:user_with_aspect, :getting_started => false)
+    visit(new_integration_sessions_path(:user_id => @me.id))
+    click_button "Login"
+  end
+  def confirm_login
+    page.has_content?("#{@me.first_name} #{@me.last_name}")
+  end
+Given /^(?:|I )am on (.+)$/ do |page_name|
+  navigate_to(page_name)
+end
+Then /^(?:|I )should see (\".+?\"[\s]*)(?:[\s]+within[\s]* "([^"]*)")?$/ do |vars, selector|
+  vars.scan(/"([^"]+?)"/).flatten.each do |text|
+    with_scope(selector) do
+      current_scope.should have_content(text)
+    end
+  end
+end
+Then /^(?:|I )should not see (\".+?\"[\s]*)(?:[\s]+within[\s]* "([^"]*)")?$/ do |vars,selector|
+  vars.scan(/"([^"]+?)"/).flatten.each do |text|
+    with_scope(selector) do
+      page.should have_no_content(text)
+    end
+  end
+end
+  def navigate_to(page_name)
+    path = path_to(page_name)
+    unless path.is_a?(Hash)
+      visit(path)
+    else
+      visit(path[:path])
+      await_elem = path[:special_elem]
+      find(await_elem.delete(:selector), await_elem)
+    end
+  end
+  def with_scope(locator)
+    if locator
+      within(locator, match: :first) do
+        yield
+      end
+    else
+      yield
+    end
+  end
+  def path_to(page_name)
+    case page_name
+      when /^person_photos page$/
+         person_photos_path(@me.person)
+      when /^the home(?: )?page$/
+        stream_path
+      when /^the mobile path$/
+        force_mobile_path
+      when /^step (\d)$/
+        if $1.to_i == 1
+          getting_started_path
+        else
+          getting_started_path(:step => $1)
+        end
+      when /^the tag page for "([^\"]*)"$/
+        tag_path($1)
+      when /^its ([\w ]+) page$/
+        send("#{$1.gsub(/\W+/, '_')}_path", @it)
+      when /^the ([\w ]+) page$/
+        send("#{$1.gsub(/\W+/, '_')}_path")
+      when /^my edit profile page$/
+        edit_profile_path
+      when /^my profile page$/
+        person_path(@me.person)
+      when /^my acceptance form page$/
+        invite_code_path(InvitationCode.first)
+      when /^the requestors profile$/
+        person_path(Request.where(:recipient_id => @me.person.id).first.sender)
+      when /^"([^\"]*)"'s page$/
+        p = User.find_by_email($1).person
+        { path: person_path(p),
+          # '#diaspora_handle' on desktop, '.description' on mobile
+          special_elem: { selector: '#diaspora_handle, .description', text: p.diaspora_handle }
+        }
+      when /^"([^\"]*)"'s photos page$/
+        p = User.find_by_email($1).person
+        person_photos_path p
+      when /^my account settings page$/
+        edit_user_path
+      when /^forgot password page$/
+          new_user_password_path
+      when /^"(\/.*)"/
+        $1
+      else
+        raise "Can't find mapping from \"#{page_name}\" to a path."
+    end
+  end
+Given /^(?:|[tT]hat )?following user[s]?(?: exist[s]?)?:$/ do |table|
+  table.hashes.each do |hash|
+    if hash.has_key? "username" and hash.has_key? "email"
+      step %{a user named "#{hash['username']}" with email "#{hash['email']}"}
+    elsif hash.has_key? "username"
+      step %{a user with username "#{hash['username']}"}
+    elsif hash.has_key? "email"
+      step %{a user with email "#{hash['email']}"}
+    end
+  end
+end
+Given /^a user with email "([^"]*)" is connected with "([^"]*)"$/ do |arg1, arg2|
+  user1 = User.where(:email => arg1).first
+  user2 = User.where(:email => arg2).first
+  connect_users(user1, user1.aspects.where(:name => "Besties").first, user2, user2.aspects.where(:name => "Besties").first)
+end
+Given /^"([^"]*)" has a public post with text "([^"]*)"$/ do |email, text|
+  user = User.find_by_email(email)
+  user.post(:status_message, :text => text, :public => true, :to => user.aspect_ids)
+end
+Given /^"([^"]*)" has a non public post with text "([^"]*)"$/ do |email, text|
+  user = User.find_by_email(email)
+  user.post(:status_message, :text => text, :public => false, :to => user.aspect_ids)
+end
+Given /^a user with email "([^\"]*)"$/ do |email|
+  create_user(:email => email)
+end
+Given /^a user with username "([^\"]*)"$/ do |username|
+  create_user(:email => username + "@" + username + '.' + username, :username => username)
+end
+Given /^a user named "([^\"]*)" with email "([^\"]*)"$/ do |name, email|
+  first, last = name.split
+  user = create_user(:email => email, :username => "#{first}_#{last}")
+  user.profile.update_attributes!(:first_name => first, :last_name => last) if first
+end
+  def create_user(overrides={})
+    default_attrs = {
+        :password => 'password',
+        :password_confirmation => 'password',
+        :getting_started => false
+    }
+
+    user = FactoryGirl.create(:user, default_attrs.merge(overrides))
+    add_standard_aspects(user)
+    user
+  end
+  def add_standard_aspects(user)
+    user.aspects.create(:name => "Besties")
+    user.aspects.create(:name => "Unicorns")
+  end

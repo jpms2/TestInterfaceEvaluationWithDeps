@@ -1,0 +1,15 @@
+Feature: Keyboard navigation
+In order not to have to move my hand to the mouse
+As a user
+I want to be able to navigate the stream by keyboard
+Background:
+Given many posts from alice for bob
+And I sign in as "bob@bob.bob"
+Scenario: navigate downwards on a profile page
+When I am on "alice@alice.alice"'s page
+And I press the "J" key somewhere
+Then post 1 should be highlighted
+And I should have navigated to the highlighted post
+When I press the "J" key somewhere
+Then post 2 should be highlighted
+And I should have navigated to the highlighted post

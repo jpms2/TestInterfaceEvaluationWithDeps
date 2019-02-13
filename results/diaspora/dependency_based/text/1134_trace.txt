@@ -1,0 +1,7 @@
+[path:\features\step_definitions\hovercard_steps.rb, methods:[0, 4, 8, 12, 16]]
+[path:\features\step_definitions\posts_steps.rb, methods:[25, 42]]
+[path:\features\step_definitions\session_steps.rb, methods:[16]]
+[path:\features\step_definitions\user_steps.rb, methods:[16]]
+[path:\features\step_definitions\web_steps.rb, methods:[21, 110, [name:with_scope, step:Then ], [name:with_scope, step:When ]]]
+[path:\features\support\paths.rb, methods:[[name:navigate_to, step:Given ], [name:navigate_to, step:When ], [name:path_to, step:Given ]]]
+[path:\features\support\user_cuke_helpers.rb, methods:[[name:automatic_login, step:Given ], [name:confirm_login, step:Given ]]]

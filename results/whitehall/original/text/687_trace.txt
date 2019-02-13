@@ -1,0 +1,8 @@
+[path:\features\step_definitions\document_steps.rb, methods:[175, 146]]
+[path:\features\step_definitions\news_article_steps.rb, methods:[108, 138]]
+[path:\features\step_definitions\session_steps.rb, methods:[0]]
+[path:\features\step_definitions\world_location_steps.rb, methods:[28]]
+[path:\features\support\document_helper.rb, methods:[[name:visit_edition_admin, step:When ], [name:publish, step:When ], [name:refute_flash_alerts_exist, step:When ]]]
+[path:\features\support\gds_sso_helper.rb, methods:[[name:login_as, step:Given ]]]
+[path:\features\support\javascript.rb, methods:[[name:select, step:When ], [name:select_from_chosen, step:When ]]]
+[path:\features\support\news_article_helper.rb, methods:[[name:find_news_article_in_locale!, step:When ]]]

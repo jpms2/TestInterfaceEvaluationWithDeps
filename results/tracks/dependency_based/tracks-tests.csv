@@ -1,0 +1,4 @@
+"Repository","https://github.com/TracksApp/tracks.git"
+"TASK","HASH","RUBY","RAILS","COVERAGE","TESTS"
+"57","48c1d7c214d91b799e56be24147b9b727c32f157","","4.1.11","simplecov","features\context_edit.feature(26);features\context_edit.feature(33);features\project_edit.feature(63)"
+"124","1ed137afa98cba9b3a8e3c79718af1d7e4d4c370","","4.1.10","simplecov","features\tickler.feature(102)"

@@ -1,0 +1,67 @@
+Given(/^there is a document tagged to specialist sectors$/) do
+  unstub_tag_finder # we're testing topic tags, remove any existing stubs
+
+  @document = create(:published_publication, :guidance)
+  document_base_path = PublishingApiPresenters.presenter_for(@document).base_path
+  parent_base_path = "/parent-topic"
+
+  document_content_item = content_item_for_base_path(document_base_path).merge!({
+    "links" => {
+      "parent" => [{ "base_path" => parent_base_path }],
+      "topics" => [{ "title" => "Topic 1" }, { "title" => "Topic 2"  }]
+    }
+  })
+  parent_content_item = content_item_for_base_path(parent_base_path).merge!({
+    "links" => {
+      "parent" => [{
+        "title" => "Top Level Topic",
+        "web_url" => "http://gov.uk/top-level-topic"
+      }]
+    }
+  })
+
+  content_store_has_item(document_base_path, document_content_item)
+  content_store_has_item(parent_base_path, parent_content_item)
+end
+  def unstub_tag_finder
+    SpecialistTagFinder.unstub(:new)
+  end
+When(/^I view the document$/) do
+  visit public_document_path(@document)
+end
+Then /^I should see (#{THE_DOCUMENT})$/ do |edition|
+  assert has_css?(record_css_selector(edition))
+end
+  def public_document_path(edition, options = {})
+    document_path(edition, options)
+  end
+Given /^a policy group "([^"]*)" exists$/ do |group_name|
+  create(:policy_group, name: group_name)
+end
+When /^I visit the policy group index$/ do
+  visit policy_groups_path
+end
+Given /^I am (?:a|an) (writer|editor|admin|GDS editor|GDS admin|importer|managing editor)(?: called "([^"]*)")?$/ do |role, name|
+  @user = case role
+  when "writer"
+    create(:writer, name: (name || "Wally Writer"))
+  when "editor"
+    create(:departmental_editor, name: (name || "Eddie Depteditor"))
+  when "admin"
+    create(:user)
+  when "GDS editor"
+    create(:gds_editor)
+  when "GDS admin"
+    create(:gds_admin)
+  when 'importer'
+    create(:importer)
+  when 'managing editor'
+    create(:managing_editor)
+  end
+  login_as @user
+end
+  def login_as(user)
+    GDS::SSO.test_user = user
+    Edition::AuditTrail.whodunnit = user
+    super(user) # warden
+  end

@@ -1,0 +1,8 @@
+[path:\features\step_definitions\admin_steps.rb, methods:[40, 58, 255]]
+[path:\features\step_definitions\email_steps.rb, methods:[12, 29, 45]]
+[path:\features\step_definitions\generic_steps.rb, methods:[192, 187]]
+[path:\features\step_definitions\pickle_steps.rb, methods:[38, 3, 72]]
+[path:\features\step_definitions\skin_steps.rb, methods:[2, 75, 141, 135, 43, 56, 19, 7]]
+[path:\features\step_definitions\user_steps.rb, methods:[38, 64, 45, 112]]
+[path:\features\step_definitions\web_steps.rb, methods:[22, 26, 106, 32, 75, 18, 38, 158, [name:with_scope, step:When ], [name:with_scope, step:Then ], [name:with_scope, step:Given ]]]
+[path:\features\support\email.rb, methods:[[name:email_for, step:Then ]]]

@@ -1,0 +1,127 @@
+Given(/^I have a omniauth account$/) do
+FactoryGirl.create(
+    :user,
+    username: 'kevin',
+    email: 'kevin@example.com',
+    provider: 'github',
+    uid: '123545',
+  )
+end
+When(/^I go to the sign in page$/) do
+  visit('/login')
+end
+When(/^click the sign in with github button$/) do
+  click_link('Sign in with Github')
+end
+Then(/^I should be logged in$/) do
+  expect(page.body).to include('Thanks for logging in with Github!')
+  expect(page.body).to include('kevin')
+end
+Given(/^I have a unconfirmed omniauth account$/) do
+  FactoryGirl.create(
+    :user,
+    username: 'kevin',
+    email: 'kevin@example.com',
+    provider: 'github',
+    uid: '123545',
+    created_at: 1.day.ago,
+    confirmed_at: nil,
+    legal_agreement: true
+  )
+end
+When(/^I sign in$/) do
+  visit('/login')
+  click_link('Sign in with Github')
+end
+Then(/^I should see a message reminding me to confirm my email address$/) do
+  expect(page).to have_content("Didn't receive confirmation instructions, or need them again?")
+end
+Given /^a course named '([^']+)' exists$/ do |course_name|
+  @course = FactoryGirl.create(:course, title: course_name)
+end
+Given /^a section named '([^']+)' exists$/ do |section_name|
+  @section = FactoryGirl.create(:section, title: section_name, course: @course)
+end
+Given /^the following lessons exist in '([^']+)' section:$/ do |section_title, table|
+  section = Section.find_by(title: section_title)
+  @lessons = []
+  table.hashes.each do |hash|
+    @lessons << FactoryGirl.create(:lesson, title: hash[:lesson_name], section: section)
+  end
+end
+Given /^I am logged in$/ do
+  @user = FactoryGirl.create(:user)
+  log_in(@user)
+  expect(page).to have_content(@user.username)
+end
+  def log_in user
+    visit root_path
+    click_link 'Login'
+
+    fill_in 'Email', with: user.email
+    fill_in 'Password', with: user.password
+
+    click_button 'Sign in'
+  end
+When(/^I click the sign out link$/) do
+  click_link('Logout')
+end
+Then(/^I should be redirected to the home page$/) do
+  expect(page).to have_current_path(home_path(ref: 'logout'))
+end
+Given(/^I have a unconfirmed account that is over (\d+) days old$/) do |arg1|
+  @user = FactoryGirl.create(:user, confirmed_at: nil, created_at: 2.days.ago)
+  @user.update_attributes(confirmation_sent_at: 2.days.ago)
+end
+When(/^I try to login$/) do
+  log_in(@user)
+end
+Then(/^a message will be displayed instructing me to confirm my email$/) do
+  expect(page).to have_content('You have to confirm your account before continuing.')
+end
+Given(/^I have an account with the email '([^']+)'$/) do |email|
+  FactoryGirl.create(:user, email: email, confirmed_at: nil)
+end
+When(/^I request for confirmation instructions to be resent$/) do
+  visit('/users/confirmation/new')
+  fill_in 'Email', with: "kevin@example.com"
+  click_button('Resend confirmation instructions')
+end
+Then(/^I should be resent a confirmation email$/) do
+  expect(page).to have_content('You will receive an email with instructions about how to confirm your account in a few minutes')
+
+  open_email('kevin@example.com')
+  expect(current_email).to have_content 'Confirm your email'
+end
+When /^I request to reset my password$/ do
+  visit root_path
+  click_link 'Login'
+  click_link 'Forgot your password?'
+
+  fill_in 'Email', with: 'kevin@example.com'
+  click_button 'Send reset instructions'
+end
+Then /^I should get an email to reset the password$/ do
+  open_email ('kevin@example.com')
+  expect(current_email).to have_content('Someone has requested a link to change your password. You can do this through the link below.')
+  expect(current_email).to have_link('Change my password')
+end
+When /^I click on the reset password link$/ do
+  current_email.click_link 'Change my password'
+end
+When /^I fill in the new password$/ do
+  fill_in 'user_password', with: 'newpassword'
+  fill_in 'user_password_confirmation', with: 'newpassword'
+  click_button 'Change my password'
+end
+When /^I fill in non-matching passwords$/ do
+  fill_in 'user_password', with: 'newpassword'
+  fill_in 'user_password_confirmation', with: 'password'
+  click_button 'Change my password'
+end
+Then /^my password should be changed$/ do
+  expect(page).to have_content('Your password was changed successfully. You are now signed in.')
+end
+Then /^I should get an error$/ do
+  expect(page).to have_content('Please review the problems below')
+end

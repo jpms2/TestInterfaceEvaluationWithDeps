@@ -1,0 +1,35 @@
+Classes: 3
+[name:Attachment, file:alphagov_whitehall\app\models\attachment.rb, step:Given ]
+[name:Options, file:alphagov_whitehall\lib\whitehall\document_filter\options.rb, step:When ]
+[name:THE_DOCUMENT, file:null, step:Then ]
+
+Methods: 23
+[name:attachments, type:Object, file:null, step:Given ]
+[name:click_button, type:Object, file:null, step:When ]
+[name:click_link, type:Object, file:null, step:When ]
+[name:click_on, type:Object, file:null, step:When ]
+[name:create, type:Object, file:null, step:Given ]
+[name:delete, type:Options, file:alphagov_whitehall\lib\whitehall\document_filter\options.rb, step:When ]
+[name:evaluate_script, type:Object, file:null, step:When ]
+[name:execute_script, type:Object, file:null, step:When ]
+[name:find, type:Object, file:null, step:When ]
+[name:find_field, type:Object, file:null, step:When ]
+[name:first, type:Object, file:null, step:Given ]
+[name:first, type:Object, file:null, step:When ]
+[name:has_css?, type:Object, file:null, step:Then ]
+[name:index, type:Admin\editionsController, file:alphagov_whitehall\app\controllers\admin\editions_controller.rb, step:null]
+[name:page, type:StatisticsAnnouncementsFilter, file:alphagov_whitehall\app\models\frontend\statistics_announcements_filter.rb, step:When ]
+[name:page, type:Paginator, file:alphagov_whitehall\app\presenters\api\paginator.rb, step:When ]
+[name:record_css_selector, type:Object, file:null, step:Then ]
+[name:select, type:Javascript, file:alphagov_whitehall\features\support\javascript.rb, step:When ]
+[name:select_from_chosen, type:Javascript, file:alphagov_whitehall\features\support\javascript.rb, step:When ]
+[name:select_option, type:Object, file:null, step:When ]
+[name:text, type:EmbassyPresenter, file:alphagov_whitehall\app\presenters\embassy_presenter.rb, step:When ]
+[name:to_json, type:Object, file:null, step:When ]
+[name:visible?, type:Object, file:null, step:When ]
+
+Referenced pages: 3
+alphagov_whitehall\app\views\admin\editions\_filter_options.html.erb
+alphagov_whitehall\app\views\admin\editions\_search_results.html.erb
+alphagov_whitehall\app\views\admin\editions\index.html.erb
+
